@@ -27,10 +27,10 @@ class StemGeoMechanicsNewtonRaphsonStrategy(GeoMechanicsNewtonRaphsonStrategy):
         for axle in self.uvec_controller.axle_model_parts:
             for condition in axle.Conditions:
                 print("Condition*: ", condition.Id)
-            print("Point Load*: ", condition.GetValue(KSM.POINT_LOAD))
-            if not all(dimLoad==0.0 for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
-                condition.SetValue(KSM.POINT_LOAD, self.model_part.GetValue(KSM.POINT_LOAD))
-                print("New Point Load*: ", condition.GetValue(KSM.POINT_LOAD))
+                print("Point Load*: ", condition.GetValue(KSM.POINT_LOAD))
+                if not all(dimLoad==0.0 for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
+                    condition.SetValue(KSM.POINT_LOAD, self.model_part.GetValue(KSM.POINT_LOAD))
+                    print("New Point Load*: ", condition.GetValue(KSM.POINT_LOAD))
 
     def SolveSolutionStep(self):
         print("Python SolverSolutionStep")
