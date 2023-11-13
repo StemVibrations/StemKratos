@@ -26,7 +26,7 @@ def CreateSolver(model, custom_settings):
         err_msg += "Available options are: \"OpenMP\""
         raise Exception(err_msg)
 
-    module_full_name = solver_module_name
+    module_full_name = 'KratosMultiphysics.StemApplication.' + solver_module_name
     solver = import_module(module_full_name).CreateSolver(model, custom_settings["solver_settings"])
 
     return solver
