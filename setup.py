@@ -21,5 +21,5 @@ class CustomStemInstallCommand(install):
 if __name__ == '__main__':
     setup(
     cmdclass={
-        'install': CustomInstallCommand,
+        'install': CustomStemInstallCommand,
     })
