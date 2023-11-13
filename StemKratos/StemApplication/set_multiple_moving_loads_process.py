@@ -16,14 +16,13 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         count = 1
         for offset in settings["configuration"].values():
             print("Offset Python: ", offset.values()[0])
-            print(count)
             moving_load_parameters = KratosMultiphysics.Parameters(settings).Clone()
             new_model_part_name = settings["model_part_name"].GetString().split('.')[-1] + "_cloned_" + str(count)
             new_model_part = self.clone_moving_condition_in_compute_model_part(new_model_part_name)
             moving_load_parameters.AddString("model_part_name", new_model_part_name)
             moving_load_parameters.RemoveValue("configuration")
             moving_load_parameters.RemoveValue("compute_model_part_name")
-            moving_load_parameters.AddDouble("offset", float(count))
+            moving_load_parameters.AddDouble("offset", float(offset.values()[0]))
             self.moving_loads.append(StemSetMovingLoadProcess(new_model_part, moving_load_parameters))
             count += 1
         self.remove_cloned_conditions()

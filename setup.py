@@ -8,9 +8,6 @@ class CustomStemInstallCommand(install):
         # Call the default install process
         install.run(self)
         
-        # Print Moving Libraries
-        print("============= Moving StemApplication =======================")
-        
         # Custom logic to move data from my_package to another_package
         source_path = 'StemKratos/StemApplication'
         destination_path = os.path.join(self.install_lib, 'KratosMultiphysics')

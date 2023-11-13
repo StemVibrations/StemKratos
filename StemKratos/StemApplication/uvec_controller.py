@@ -36,13 +36,12 @@ class StemUvecController:
         for part in model_part.SubModelParts:
             if (self.uvec_base_model_part + "_cloned_") in part.Name:
                 self.axle_model_parts.append(model_part.GetSubModelPart(part.Name))
-                print("STEM_UVEC_CONTROLLER:: Added ", part.Name)
+                print("Info: STEM_UVEC_CONTROLLER:: Added ", part.Name)
 
     def execute_uvec_update_kratos(self, json_data):
         uvec_json = KratosMultiphysics.Parameters(self.callback_function(json_data.WriteJsonString()))
         for axle in self.axle_model_parts:
             axle_number = (axle.Name.split("_")[-1])
-            print(uvec_json["loads"][axle_number].GetVector())
             axle.SetValue(KSM.POINT_LOAD, uvec_json["loads"][axle_number].GetVector())
         return uvec_json
 
