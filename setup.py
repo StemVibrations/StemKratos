@@ -7,13 +7,6 @@ class CustomStemInstallCommand(install):
     def run(self):
         # Call the default install process
         install.run(self)
-        
-        folder_path = os.getcwd()
-        folder_contents = os.listdir(folder_path + "/StemKratos")
-        # Print the contents of the folder
-        print("Contents of the folder:")
-        for item in folder_contents:
-            print(item)
             
         # Custom logic to move data from my_package to another_package
         source_path = 'StemKratos/StemApplication'
