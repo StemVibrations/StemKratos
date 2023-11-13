@@ -31,13 +31,15 @@ class StemGeoMechanicsNewtonRaphsonStrategy(GeoMechanicsNewtonRaphsonStrategy):
 
     def SolveSolutionStep(self):
         print("Info: Stem SolverSolutionStep")
+        self.uvec_controller.update_dt(self.uvec_data)
         for iter_no in range(self.max_iters):
 
             print("Info: Stem Non_Linear Iteration: ", iter_no + 1)
 
             # call UVEC dll and update kratos data
             print("Info: Executing UVEC and updating Kratos with result")            
-            self.uvec_controller.execute_uvec_update_kratos(self.uvec_data)
+            self.uvec_data=self.uvec_controller.execute_uvec_update_kratos(self.uvec_data)
+            
             if iter_no != 0 and not is_converged:
                 self.re_initialize_condition_solution_step()
 

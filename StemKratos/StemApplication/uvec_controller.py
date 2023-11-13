@@ -38,6 +38,11 @@ class StemUvecController:
                 self.axle_model_parts.append(model_part.GetSubModelPart(part.Name))
                 print("Info: STEM_UVEC_CONTROLLER:: Added ", part.Name)
 
+    def update_dt(self, json_data):
+        if not json_data.Has("dt"):
+            json_data.AddEmptyValue("dt")
+        json_data.AddDouble("dt", self.axle_model_parts[0].ProcessInfo[KratosMultiphysics.DELTA_TIME])
+
     def execute_uvec_update_kratos(self, json_data):
         uvec_json = KratosMultiphysics.Parameters(self.callback_function(json_data.WriteJsonString()))
         for axle in self.axle_model_parts:
