@@ -42,8 +42,17 @@ class StemUvecController:
         if not json_data.Has("dt"):
             json_data.AddEmptyValue("dt")
         json_data.AddDouble("dt", self.axle_model_parts[0].ProcessInfo[KratosMultiphysics.DELTA_TIME])
+        if not json_data.Has("t"):
+            json_data.AddEmptyValue("t")
+        json_data.AddDouble("t", self.axle_model_parts[0].ProcessInfo[KratosMultiphysics.TIME])
 
     def execute_uvec_update_kratos(self, json_data):
+        # make sure all axles have requried empty data structure
+        required_axle_parameters = ["u", "theta", "loads"]
+        for axle in self.axle_model_parts:
+            axle_number = (axle.Name.split("_")[-1])
+            for variable_json in required_axle_parameters: 
+                self.add_empty_variable_to_parameters(json_data, axle_number, axle, variable_json)
         uvec_json = KratosMultiphysics.Parameters(self.callback_function(json_data.WriteJsonString()))
         for axle in self.axle_model_parts:
             axle_number = (axle.Name.split("_")[-1])
@@ -58,11 +67,14 @@ class StemUvecController:
                 values[dim] += condition.GetValue(Variable)[dim]
         return KratosMultiphysics.Vector(values)
 
-    def update_uvec_variable_from_kratos(self, json_data, axle_number, axle, variable_json, variable_kratos):
+    def add_empty_variable_to_parameters(self, json_data, axle_number, axle, variable_json):
         if not json_data.Has(variable_json):
             json_data.AddEmptyValue(variable_json)
         if not json_data[variable_json].Has(axle_number):
             json_data[variable_json].AddValue(axle_number, KratosMultiphysics.Parameters("[]"))
+        
+    def update_uvec_variable_from_kratos(self, json_data, axle_number, axle, variable_json, variable_kratos):
+        self.add_empty_variable_to_parameters(json_data, axle_number, axle, variable_json)
         json_data[variable_json][axle_number].SetVector(self.getMovingConditionVariable(axle, variable_kratos))
 
     def update_uvec_from_kratos(self, json_data):
