@@ -3,8 +3,7 @@ import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
 from KratosMultiphysics.StemApplication.set_moving_load_process import StemSetMovingLoadProcess
 
-class 
-(KratosMultiphysics.Process):
+class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
 
     def __init__(self, model_part, settings):
         KratosMultiphysics.Process.__init__(self)
@@ -38,7 +37,7 @@ class
 
     def clone_moving_condition_in_compute_model_part(self, new_body_part_name):
         new_model_part = self.compute_model_part.CreateSubModelPart(new_body_part_name)
-        new_model_part.ProcessInfo[KSM.POINT_LOAD] = self.settings["load"].GetVector()
+        new_model_part.SetValue(KSM.POINT_LOAD, self.settings["load"].GetVector())
         node_ids = [node.Id for node in self.model_part.GetNodes()]
         new_model_part.AddNodes(node_ids)
         index = self.get_max_conditions_index()
