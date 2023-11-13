@@ -1,1 +1,1 @@
-include StemApplication\*.py
+recursive-include StemApplication/*.py
