@@ -16,7 +16,7 @@ def CreateSolver(model, custom_settings):
     if (parallelism == "OpenMP"):
         solver_type = solver_type_raw.lower()
         if solver_type in ("u_pw", "geomechanics_u_pw_solver", "twophase"):
-            solver_module_name = "stem_geomechanics_U_Pw_solver"
+            solver_module_name = "geomechanics_U_Pw_solver"
         else:
             err_msg =  "The requested solver type \"" + solver_type + "\" is not in the python solvers wrapper\n"
             err_msg += "Available options are: \"geomechanics_U_Pw_solver\""
