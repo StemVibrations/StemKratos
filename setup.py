@@ -9,9 +9,7 @@ class CustomStemInstallCommand(install):
         install.run(self)
         
         folder_path = os.getcwd()
-        print(folder_path)
-        folder_contents = os.listdir(folder_path)
-    
+        folder_contents = os.listdir(folder_path + "/StemKratos")
         # Print the contents of the folder
         print("Contents of the folder:")
         for item in folder_contents:
