@@ -22,7 +22,7 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
             moving_load_parameters.AddString("model_part_name", new_model_part_name)
             moving_load_parameters.RemoveValue("configuration")
             moving_load_parameters.RemoveValue("compute_model_part_name")
-            moving_load_parameters.AddDouble("offset", float(offset.values()[0]))
+            moving_load_parameters.AddValue("offset", offset.values()[0])
             self.moving_loads.append(StemSetMovingLoadProcess(new_model_part, moving_load_parameters))
             count += 1
         self.remove_cloned_conditions()
