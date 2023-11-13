@@ -13,7 +13,7 @@ class CustomStemInstallCommand(install):
         
         # Custom logic to move data from my_package to another_package
         source_path = 'StemKratos/StemApplication'
-        destination_path = os.path.join(self.install_lib, 'KratosMultiphysics', 'StemApplication')
+        destination_path = os.path.join(self.install_lib, 'KratosMultiphysics')
 
         # Ensure the destination directory exists
         os.makedirs(destination_path, exist_ok=True)
