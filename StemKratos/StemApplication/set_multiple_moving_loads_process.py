@@ -1,7 +1,7 @@
 # Importing the Kratos Library
 import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
-from KratosMultiphysics.StemApplication.stem_set_moving_load_process import StemSetMovingLoadProcess
+from KratosMultiphysics.StemApplication.set_moving_load_process import StemSetMovingLoadProcess
 
 class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
 

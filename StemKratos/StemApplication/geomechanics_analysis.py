@@ -1,7 +1,7 @@
 import KratosMultiphysics as Kratos
 
 from KratosMultiphysics.GeoMechanicsApplication.geomechanics_analysis import GeoMechanicsAnalysis
-import KratosMultiphysics.StemApplication.geomechanics_solvers_wrapper
+from KratosMultiphysics.StemApplication.geomechanics_solvers_wrapper import CreateSolver
 
 
 class StemGeoMechanicsAnalysis(GeoMechanicsAnalysis):
@@ -10,7 +10,7 @@ class StemGeoMechanicsAnalysis(GeoMechanicsAnalysis):
         super().__init__(model, project_parameters)
 
     def _CreateSolver(self):
-        return stem_geomechanics_solvers_wrapper.CreateSolver(self.model, self.project_parameters)
+        return CreateSolver(self.model, self.project_parameters)
 
 if __name__ == '__main__':
     from sys import argv

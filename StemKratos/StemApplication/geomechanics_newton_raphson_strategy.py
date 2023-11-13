@@ -1,6 +1,6 @@
 from KratosMultiphysics.GeoMechanicsApplication import GeoMechanicsNewtonRaphsonStrategy
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
-import KratosMultiphysics.StemApplication.stem_uvec_controller as stem
+from KratosMultiphysics.StemApplication.uvec_controller import StemUvecController
 
 class StemGeoMechanicsNewtonRaphsonStrategy(GeoMechanicsNewtonRaphsonStrategy):
 
@@ -21,7 +21,7 @@ class StemGeoMechanicsNewtonRaphsonStrategy(GeoMechanicsNewtonRaphsonStrategy):
         self.model_part = model_part
         self.max_iters = max_iters
         self.uvec_data = uvec_data["uvec_data"]
-        self.uvec_controller = stem.StemUvecController(uvec_data, model_part)
+        self.uvec_controller = StemUvecController(uvec_data, model_part)
 
     def re_initialize_condition_solution_step(self):
         for axle in self.uvec_controller.axle_model_parts:
