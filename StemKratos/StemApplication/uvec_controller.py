@@ -43,7 +43,7 @@ class StemUvecController:
         for axle in self.axle_model_parts:
             axle_number = (axle.Name.split("_")[-1])
             print(uvec_json["loads"][axle_number].GetVector())
-            axle.ProcessInfo[KSM.POINT_LOAD] = uvec_json["loads"][axle_number].GetVector()
+            axle.SetValue(KSM.POINT_LOAD, uvec_json["loads"][axle_number].GetVector())
         return uvec_json
 
     def getMovingConditionVariable(self, axle, Variable):

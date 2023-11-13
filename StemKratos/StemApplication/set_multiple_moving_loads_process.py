@@ -3,7 +3,8 @@ import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
 from KratosMultiphysics.StemApplication.set_moving_load_process import StemSetMovingLoadProcess
 
-class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
+class 
+(KratosMultiphysics.Process):
 
     def __init__(self, model_part, settings):
         KratosMultiphysics.Process.__init__(self)
@@ -27,6 +28,7 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
             self.moving_loads.append(StemSetMovingLoadProcess(new_model_part, moving_load_parameters))
             count += 1
         self.remove_cloned_conditions()
+        
     def get_max_conditions_index(self):
         max_index = 0
         for condition in self.model_part.GetRootModelPart().Conditions:
