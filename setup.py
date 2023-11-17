@@ -20,8 +20,8 @@ class CustomStemInstallCommand(install):
 
         # First copy the directory to a temporary location to prevent permission issues
         # Then move the entire directory
-        shutil.copytree(source_path, tmp_path)
-        shutil.move(tmp_path, destination_path)
+        # shutil.copytree(source_path, tmp_path)
+        shutil.move(source_path, destination_path)
 
 if __name__ == '__main__':
     setup(
