@@ -7,7 +7,8 @@ import KratosMultiphysics.StemApplication.geomechanics_analysis as analysis
 def test_call_uvec():
 
     test_file_dir = r"tests/test_data/input_data_expected_moving_load_uvec"
-    parameter_file_name = os.path.join(test_file_dir, "ProjectParameters_stage1.json")
+
+    parameter_file_name = "ProjectParameters_stage1.json"
 
     # set stage parameters
     cwd = os.getcwd()
@@ -23,3 +24,6 @@ def test_call_uvec():
 
     # change working directory back to original working directory
     os.chdir(cwd)
+
+if __name__ == '__main__':
+    test_call_uvec()
