@@ -24,9 +24,10 @@ class StemGeoMechanicsNewtonRaphsonStrategy(GeoMechanicsNewtonRaphsonStrategy):
         self.uvec_controller = StemUvecController(uvec_data, model_part)
 
     def re_initialize_condition_solution_step(self):
+        precision = 1e-12
         for axle in self.uvec_controller.axle_model_parts:
             for condition in axle.Conditions:
-                if not all(dimLoad==0.0 for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
+                if not all(abs(dimLoad) < precision for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
                     condition.SetValue(KSM.POINT_LOAD, axle.GetValue(KSM.POINT_LOAD))
 
     def SolveSolutionStep(self):
@@ -38,7 +39,7 @@ class StemGeoMechanicsNewtonRaphsonStrategy(GeoMechanicsNewtonRaphsonStrategy):
 
             # call UVEC dll and update kratos data
             print("Info: Executing UVEC and updating Kratos with result")            
-            self.uvec_data=self.uvec_controller.execute_uvec_update_kratos(self.uvec_data)
+            self.uvec_data = self.uvec_controller.execute_uvec_update_kratos(self.uvec_data)
             
             if iter_no != 0 and not is_converged:
                 self.re_initialize_condition_solution_step()
