@@ -1,7 +1,6 @@
 
 import os
 import KratosMultiphysics as Kratos
-import KratosMultiphysics.StemApplication as KratosStem
 import KratosMultiphysics.StemApplication.geomechanics_analysis as analysis
 
 def test_call_uvec():

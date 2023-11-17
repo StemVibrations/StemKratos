@@ -38,7 +38,7 @@
         "newmark_theta":                      0.5,
         "rayleigh_m":                         0.0,
         "rayleigh_k":                         0.0,
-        "strategy_type":                      "newton_raphson",
+        "strategy_type":                      "newton_raphson_with_uvec",
         "convergence_criterion":              "displacement_criterion",
         "displacement_relative_tolerance":    1.0E-4,
         "displacement_absolute_tolerance":    1.0E-9,
@@ -63,14 +63,14 @@
         "line_search_tolerance":              0.5,
         "rotation_dofs":                      true,
         "linear_solver_settings":             {
-            "solver_type":   "skyline_lu_factorization",
-            "scaling":       true
+            "solver_type":   "amgcl",
+            "scaling":       false
         },
         "problem_domain_sub_model_part_list": ["Soil_drained-auto-1"],
         "processes_sub_model_part_list":      ["Solid_Displacement-auto-1","moving_load"],
         "body_domain_sub_model_part_list":    ["Soil_drained-auto-1"],
 		"uvec"							    :    {
-			"uvec_path"                     :     "C:/Users/jdnut/Desktop/StemPython/UVEC/my_sample_uvec.py",
+			"uvec_path"                     :     "my_sample_uvec.py",
 			"uvec_method"				    :     "uvec_test",
 			"uvec_model_part"				:	  "moving_load",
 			"uvec_data"						:     {"dt": 0.0, "u":{}, "theta":{}, "loads":{}, "parameters" :{}, "state":{}}
