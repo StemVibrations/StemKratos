@@ -75,36 +75,25 @@
 			"uvec_model_part"				:	  "moving_load",
 			"uvec_data"						:     {"dt": 0.0, "u":{}, "theta":{}, "loads":{}, "parameters" :{}, "state":{}}
 		}
-		
+
     },
     "output_processes": {
-        "gid_output": [{
-            "python_module": "gid_output_process",
+        "vtk_output": [{
+            "python_module": "vtk_output_process",
             "kratos_module": "KratosMultiphysics",
-            "process_name": "GiDOutputProcess",
+            "process_name": "VtkOutputProcess",
             "Parameters":    {
                 "model_part_name": "PorousDomain.porous_computational_model_part",
-                "output_name": "moving_load_soil_quadr",
-                "postprocess_parameters": {
-                    "result_file_configuration": {
-                        "gidpost_flags":       {
-                            "WriteDeformedMeshFlag": "WriteUndeformed",
-                            "WriteConditionsFlag":   "WriteElementsOnly",
-                            "GiDPostMode":           "GiD_PostAscii",
-                            "MultiFileFlag":         "SingleFile"
-                        },
-                        "file_label":          "step",
-                        "output_control_type": "step",
-                        "output_interval":     1,
-                        "body_output":         true,
-                        "node_output":         false,
-                        "skin_output":         false,
-                        "plane_output":        [],
-                        "nodal_results":       ["DISPLACEMENT","TOTAL_DISPLACEMENT","WATER_PRESSURE","VOLUME_ACCELERATION"],
-                        "gauss_point_results": ["GREEN_LAGRANGE_STRAIN_TENSOR","ENGINEERING_STRAIN_TENSOR","CAUCHY_STRESS_TENSOR","TOTAL_STRESS_TENSOR","VON_MISES_STRESS","FLUID_FLUX_VECTOR","HYDRAULIC_HEAD"]
-                    },
-                    "point_data_configuration":  []
-                }
+                "output_path": "output/porous_computational_model_part",
+                "file_format": "ascii",
+                "output_precision": 7,
+                "output_control_type": "step",
+                "output_interval": 10,
+                "nodal_solution_step_data_variables": [
+                                "DISPLACEMENT",
+                                "TOTAL_DISPLACEMENT"
+                            ],
+                "gauss_point_variables_in_elements": []
             }
         }]
     },
