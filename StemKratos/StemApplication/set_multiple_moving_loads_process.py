@@ -6,10 +6,10 @@ from KratosMultiphysics.StemApplication.set_moving_load_process import StemSetMo
 
 # condition name mapper, the key is the dimension and the number of nodes of the condition,
 # the value is the name of the condition
-CONDITION_NAME_MAP = {[2, 2]: "MovingLoadCondition2D2N",
-                      [2, 3]: "MovingLoadCondition2D3N",
-                      [3, 2]: "MovingLoadCondition3D2N",
-                      [3, 3]: "MovingLoadCondition3D3N"}
+CONDITION_NAME_MAP = {(2, 2): "MovingLoadCondition2D2N",
+                      (2, 3): "MovingLoadCondition2D3N",
+                      (3, 2): "MovingLoadCondition3D2N",
+                      (3, 3): "MovingLoadCondition3D3N"}
 
 class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
 
@@ -63,7 +63,7 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
             node_ids = [node.Id for node in condition.GetNodes()]
             print("Node ids: ", node_ids)
             geom = condition.GetGeometry()
-            moving_load_name = CONDITION_NAME_MAP[[geom.WorkingSpaceDimension(), geom.PointsNumber()]]
+            moving_load_name = CONDITION_NAME_MAP[(geom.WorkingSpaceDimension(), geom.PointsNumber())]
 
             new_model_part.CreateNewCondition(moving_load_name, index, node_ids, condition.Properties)
         return new_model_part
