@@ -1,4 +1,3 @@
-
 from tests.utils import Utils
 
 
@@ -10,9 +9,3 @@ def test_call_uvec():
 
     model, stage = Utils.run_stage(test_file_dir, parameter_file_name)
 
-
-
-
-
-if __name__ == '__main__':
-    test_call_uvec()
