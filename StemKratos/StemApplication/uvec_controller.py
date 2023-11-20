@@ -63,8 +63,9 @@ class StemUvecController:
         # This assumes that only one condition contains the moving load has values:
         values = [0.0, 0.0, 0.0]
         for condition in axle.Conditions:
-            for dim in range(3):
-                values[dim] += condition.GetValue(Variable)[dim]
+            cond_values = condition.GetValue(Variable)
+            for i in range(3):
+                values[i] += cond_values[i]
         return KratosMultiphysics.Vector(values)
 
     def add_empty_variable_to_parameters(self, json_data, axle_number, axle, variable_json):

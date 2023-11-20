@@ -22,7 +22,7 @@ class StemGeoMechanicsNewtonRaphsonStrategy(GeoMechanicsNewtonRaphsonStrategy):
                  move_mesh_flag,
                  uvec_data):
         super().__init__(model_part, scheme, linear_solver, convergence_criterion, builder_and_solver,
-                         strategy_params, 1, compute_reactions, reform_step_dofs, move_mesh_flag)
+                         strategy_params, 0, compute_reactions, reform_step_dofs, move_mesh_flag)
         self.model_part = model_part
         self.max_iters = max_iters
         self.uvec_data = uvec_data["uvec_data"]
