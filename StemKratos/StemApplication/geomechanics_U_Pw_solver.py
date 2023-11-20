@@ -48,7 +48,7 @@ class UPwUvecSolver(UPwGeoSolver):
         if strategy_type.lower() == "newton_raphson_with_uvec":
 
             self.main_model_part.ProcessInfo.SetValue(GeoMechanicsApplication.IS_CONVERGED, True)
-            self.main_model_part.ProcessInfo.SetValue(KratosMultiphysics.NL_ITERATION_NUMBER, 1)
+            self.main_model_part.ProcessInfo.SetValue(KratosMultiphysics.NL_ITERATION_NUMBER, 0)
 
             max_iters = self.settings["max_iterations"].GetInt()
             compute_reactions = self.settings["compute_reactions"].GetBool()
