@@ -64,9 +64,8 @@ class StemUvecController:
         values = [0.0, 0.0, 0.0]
         for condition in axle.Conditions:
             cond_values = condition.GetValue(Variable)
-            if any(cond_values):
-                for i in range(len(values)):
-                    values[i] += cond_values[i]
+            for i in range(3):
+                values[i] += cond_values[i]
         return KratosMultiphysics.Vector(values)
 
     def add_empty_variable_to_parameters(self, json_data, axle_number, axle, variable_json):
