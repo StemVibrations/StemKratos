@@ -2,6 +2,9 @@ import KratosMultiphysics
 from importlib import import_module
 
 def CreateSolver(model, custom_settings):
+    """
+    This function creates the Solver and ensures that the solve module comes from the StemApplication.
+    """
 
     if (type(model) != KratosMultiphysics.Model):
         raise Exception("input is expected to be provided as a Kratos Model object")

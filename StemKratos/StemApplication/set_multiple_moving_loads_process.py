@@ -3,6 +3,14 @@ import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
 from KratosMultiphysics.StemApplication.set_moving_load_process import StemSetMovingLoadProcess
 
+
+# condition name mapper, the key is the dimension and the number of nodes of the condition,
+# the value is the name of the condition
+CONDITION_NAME_MAP = {[2, 2]: "MovingLoadCondition2D2N",
+                      [2, 3]: "MovingLoadCondition2D3N",
+                      [3, 2]: "MovingLoadCondition3D2N",
+                      [3, 3]: "MovingLoadCondition3D3N"}
+
 class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
 
     def __init__(self, model_part, settings):
@@ -23,11 +31,18 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
             moving_load_parameters.RemoveValue("configuration")
             moving_load_parameters.RemoveValue("compute_model_part_name")
             moving_load_parameters.AddValue("offset", offset.values()[0])
+
+            # set a moving load on the location of each wheel
             self.moving_loads.append(StemSetMovingLoadProcess(new_model_part, moving_load_parameters))
             count += 1
+
+        # remove condition of the original model part, as they are cloned
         self.remove_cloned_conditions()
         
     def get_max_conditions_index(self):
+        """
+        This function returns the maximum index of the conditions in the main model part
+        """
         max_index = 0
         for condition in self.model_part.GetRootModelPart().Conditions:
             if condition.Id > max_index:
@@ -35,6 +50,9 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         return max_index
 
     def clone_moving_condition_in_compute_model_part(self, new_body_part_name):
+        """
+        This function clones the moving load condition of the current model part to a new model part
+        """
         new_model_part = self.compute_model_part.CreateSubModelPart(new_body_part_name)
         new_model_part.SetValue(KSM.POINT_LOAD, self.settings["load"].GetVector())
         node_ids = [node.Id for node in self.model_part.GetNodes()]
@@ -44,7 +62,10 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
             index += 1
             node_ids = [node.Id for node in condition.GetNodes()]
             print("Node ids: ", node_ids)
-            new_model_part.CreateNewCondition("MovingLoadCondition2D3N", index, node_ids, condition.Properties)
+            geom = condition.GetGeometry()
+            moving_load_name = CONDITION_NAME_MAP[[geom.WorkingSpaceDimension(), geom.PointsNumber()]]
+
+            new_model_part.CreateNewCondition(moving_load_name, index, node_ids, condition.Properties)
         return new_model_part
 
     def remove_cloned_conditions(self):

@@ -17,8 +17,14 @@ class UPwUvecSolver(UPwGeoSolver):
 
     @classmethod
     def GetDefaultParameters(cls):
+        """
+        This function returns the default input parameters of the solver.
+        """
+
+        # Set default solver parameters from UPw geo solver
         this_defaults = super().GetDefaultParameters()
 
+        # Add uvec parameters
         this_defaults.AddValue("uvec", KratosMultiphysics.Parameters("""{
             "uvec_path"              :     "",
             "uvec_method"		     :     "",
@@ -26,12 +32,19 @@ class UPwUvecSolver(UPwGeoSolver):
             "uvec_data"				 :     {"parameters":{}, "state":{}}
             }"""))
 
-
+        # add missing parameters
         this_defaults.AddMissingParameters(super().GetDefaultParameters())
+
         return this_defaults
 
     def _ConstructSolver(self, builder_and_solver, strategy_type):
+        """
+        This function constructs the solver according to the solver settings. If newton_raphson_with_uvec is selected,
+        the solver is constructed from the StemGeoMechanicsNewtonRaphsonStrategy class. Else the solver is constructed
+        from the base class.
+        """
 
+        # define newton raphson with uvec strategy
         if strategy_type.lower() == "newton_raphson_with_uvec":
 
             self.main_model_part.ProcessInfo.SetValue(GeoMechanicsApplication.IS_CONVERGED, True)
