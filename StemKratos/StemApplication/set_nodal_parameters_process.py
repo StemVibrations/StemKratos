@@ -1,16 +1,34 @@
 import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
 
-# get available nodal parameters
+# Set available nodal parameter options
 NODAL_PARAMETER_OPTIONS = [KSM.NODAL_DAMPING_RATIO, KSM.NODAL_DISPLACEMENT_STIFFNESS,
                            KSM.NODAL_ROTATIONAL_DAMPING_RATIO,
                            KSM.NODAL_ROTATIONAL_STIFFNESS, KratosMultiphysics.NODAL_MASS]
 
-class SetNodalParametersProcess(KratosMultiphysics.Process):
 
-    def __init__(self, model_part, settings):
+class SetNodalParametersProcess(KratosMultiphysics.Process):
+    """
+    This process sets the nodal parameters of the model part. The nodal parameters are set to the values of the
+    properties of the model part.
+
+    Inheritance:
+        - :class:`KratosMultiphysics.Process`
+
+    Attributes:
+        - model_part (KratosMultiphysics.ModelPart): model part containing the elements
+        - settings (KratosMultiphysics.Parameters): settings of the process
+
+
+    """
+
+    def __init__(self, model_part: KratosMultiphysics.ModelPart, settings: KratosMultiphysics.Parameters):
         """
         Initialize process
+
+        Args:
+            - model_part (KratosMultiphysics.ModelPart): model part containing the elements
+            - settings (KratosMultiphysics.Parameters): settings of the process
         """
         KratosMultiphysics.Process.__init__(self)
         self.model_part = model_part
@@ -35,21 +53,38 @@ class SetNodalParametersProcess(KratosMultiphysics.Process):
                 element.SetValue(parameter, model_part_properties.GetValue(parameter))
 
 
-def Factory(settings, model):
+def Factory(settings: KratosMultiphysics.Parameters, model: KratosMultiphysics.Model):
     """
-    This process sets the nodal parameters of the model part. The nodal parameters are set to the values of the
-    properties of the model part.
+    This function creates a process setting the nodal parameters of the model part. The nodal parameters are set to the
+    values of the properties of the model part.
+
+    Args:
+        - settings (KratosMultiphysics.Parameters): settings of the process
+        - model (KratosMultiphysics.Model): Kratos model containing the model part
+
+    raises:
+        - Exception: if the settings are not correct
+
+    returns:
+        - :class:`SetNodalParametersProcess`: process setting the nodal parameters of the model part
     """
+
+    # checks if the input is a Parameters object, encapsulating a json string
     if not isinstance(settings, KratosMultiphysics.Parameters):
         raise Exception("expected input shall be a Parameters object, encapsulating a json string")
 
+    # Get default settings
     default_settings = KratosMultiphysics.Parameters("""
             {
                 "model_part_name" : "please_specify_model_part_name",
             }
             """
                                                      )
+
+    # Overwrite the default settings with user-provided parameters
     process_settings = settings["Parameters"]
+
+    # Validate settings
     process_settings.ValidateAndAssignDefaults(default_settings)
 
     # Set process
