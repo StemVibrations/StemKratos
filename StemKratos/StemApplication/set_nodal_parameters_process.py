@@ -2,9 +2,9 @@ import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
 
 # get available nodal parameters
-NODAL_PARAMETER_OPTIONS = [KratosMultiphysics.NODAL_DAMPING_RATIO, KratosMultiphysics.NODAL_DISPLACEMENT_STIFFNESS,
-                           KratosMultiphysics.NODAL_ROTATIONAL_DAMPING_RATIO,
-                           KratosMultiphysics.NODAL_ROTATIONAL_STIFFNESS, KratosMultiphysics.NODAL_MASS]
+NODAL_PARAMETER_OPTIONS = [KSM.NODAL_DAMPING_RATIO, KSM.NODAL_DISPLACEMENT_STIFFNESS,
+                           KSM.NODAL_ROTATIONAL_DAMPING_RATIO,
+                           KSM.NODAL_ROTATIONAL_STIFFNESS, KratosMultiphysics.NODAL_MASS]
 
 class SetNodalParametersProcess(KratosMultiphysics.Process):
 
