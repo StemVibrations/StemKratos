@@ -2,15 +2,10 @@ import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
 import KratosMultiphysics.StemApplication as StemKratos
 
-import KratosMultiphysics.StemApplication.set_nodal_parameters_process as SetNodalParametersProcess
+from KratosMultiphysics.StemApplication.set_nodal_parameters_process import SetNodalParametersProcess
 
 
 def test_add_nodal_parameters_process():
-
-
-
-    node_1 = KratosMultiphysics.Node(1, 0.0, 0.0, 0.0)
-    # mass_element = KratosMultiphysics.Element(1, [1], KratosMultiphysics.Properties(0))
 
 
     model = KratosMultiphysics.Model()
@@ -32,11 +27,11 @@ def test_add_nodal_parameters_process():
 
     process.ExecuteInitialize()
 
+    # check if nodal mass is now set on element rather than properties
+    assert mass_element.GetValue(KratosMultiphysics.NODAL_MASS) == 1.0
 
-
-
-
-    mass_element_model_part = KratosMultiphysics.ModelPart("mass_element_model_part", 0)
+    # check if young modulus has not been set
+    assert mass_element.GetValue(KratosMultiphysics.YOUNG_MODULUS) == 0.0
 
 
 
