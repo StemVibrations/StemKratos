@@ -47,7 +47,7 @@ class StemUvecController:
         json_data.AddDouble("t", self.axle_model_parts[0].ProcessInfo[KratosMultiphysics.TIME])
         if not json_data.Has("time_index"):
             json_data.AddEmptyValue("time_index")
-        json_data.AddDouble("time_index", self.axle_model_parts[0].ProcessInfo[KratosMultiphysics.STEP] - 1)
+        json_data.AddInt("time_index", self.axle_model_parts[0].ProcessInfo[KratosMultiphysics.STEP] - 1)
 
     def execute_uvec_update_kratos(self, json_data):
         # make sure all axles have required empty data structure
