@@ -37,7 +37,7 @@ class SetNodalParametersProcess(KratosMultiphysics.Process):
     def ExecuteInitialize(self):
         """
         This function sets the nodal parameters of the model part. The nodal parameters are set to the values of the
-        properties of the model part.
+        properties of the model part. This function name cannot be changed. This name is recognised by Kratos.
         """
 
         # get properties of the model part
@@ -53,10 +53,10 @@ class SetNodalParametersProcess(KratosMultiphysics.Process):
                 element.SetValue(parameter, model_part_properties.GetValue(parameter))
 
 
-def Factory(settings: KratosMultiphysics.Parameters, model: KratosMultiphysics.Model):
+def Factory(settings: KratosMultiphysics.Parameters, model: KratosMultiphysics.Model) -> SetNodalParametersProcess:
     """
     This function creates a process setting the nodal parameters of the model part. The nodal parameters are set to the
-    values of the properties of the model part.
+    values of the properties of the model part. This function name cannot be changed. This name is recognised by Kratos.
 
     Args:
         - settings (KratosMultiphysics.Parameters): settings of the process

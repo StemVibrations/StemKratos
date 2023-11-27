@@ -69,6 +69,9 @@ def test_add_nodal_parameters_process_spring_damper_element():
     spring_damper_element_properties.SetValue(KSM.NODAL_DAMPING_RATIO, [0, 0, 2.0])
     spring_damper_element_properties.SetValue(KSM.NODAL_ROTATIONAL_DAMPING_RATIO, [0, 2, 2.0])
 
+    # non-available property
+    spring_damper_element_properties.SetValue(KratosMultiphysics.YOUNG_MODULUS, 1.0)
+
     # Initialize process
     process = SetNodalParametersProcess(spring_damper_element_model_part,
                                         KratosMultiphysics.Parameters(
@@ -83,3 +86,6 @@ def test_add_nodal_parameters_process_spring_damper_element():
     assert list(spring_damper_element.GetValue(KSM.NODAL_ROTATIONAL_STIFFNESS)) == [0, 1, 1.0]
     assert list(spring_damper_element.GetValue(KSM.NODAL_DAMPING_RATIO)) == [0, 0, 2.0]
     assert list(spring_damper_element.GetValue(KSM.NODAL_ROTATIONAL_DAMPING_RATIO)) == [0, 2, 2.0]
+
+    # check if young modulus has not been set
+    assert spring_damper_element.GetValue(KratosMultiphysics.YOUNG_MODULUS) == 0.0
