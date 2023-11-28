@@ -73,3 +73,13 @@ class UPwUvecSolver(UPwGeoSolver):
             return solving_strategy
         else:
             return super()._ConstructSolver(builder_and_solver, strategy_type)
+
+    def AddDofs(self):
+        """
+        This function initializes the water pressure to 0 for all nodes.
+        """
+        super().AddDofs()
+
+        for node in self.main_model_part.Nodes:
+            if node.HasDofFor(KratosMultiphysics.WATER_PRESSURE):
+                node.SetSolutionStepValue(KratosMultiphysics.WATER_PRESSURE, 0, 0)
