@@ -76,7 +76,7 @@ def Factory(settings: KratosMultiphysics.Parameters, model: KratosMultiphysics.M
     # Get default settings
     default_settings = KratosMultiphysics.Parameters("""
             {
-                "model_part_name" : "please_specify_model_part_name",
+                "model_part_name" : "please_specify_model_part_name"
             }
             """
                                                      )
