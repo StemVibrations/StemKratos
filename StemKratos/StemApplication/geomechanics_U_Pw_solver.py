@@ -1,4 +1,3 @@
-
 import sys
 # Import base class file
 import KratosMultiphysics
