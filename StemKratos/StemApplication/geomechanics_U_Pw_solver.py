@@ -77,7 +77,8 @@ class UPwUvecSolver(UPwGeoSolver):
 
     def KeepAdvancingSolutionLoop(self, end_time):
         """
-        This function checks if the time step should be continued.
+        This function checks if the time step should be continued. The name of the function is kept the same as in the
+        base class, such that the function is overwritten. Thus, the name cannot be changed.
 
         Args:
             - end_time: The end time of the simulation.
