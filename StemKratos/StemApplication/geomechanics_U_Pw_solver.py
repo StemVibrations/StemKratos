@@ -1,3 +1,4 @@
+import sys
 # Import base class file
 import KratosMultiphysics
 import KratosMultiphysics.GeoMechanicsApplication as GeoMechanicsApplication
@@ -73,3 +74,17 @@ class UPwUvecSolver(UPwGeoSolver):
             return solving_strategy
         else:
             return super()._ConstructSolver(builder_and_solver, strategy_type)
+
+    def KeepAdvancingSolutionLoop(self, end_time: float) -> bool:
+        """
+        This function checks if the time step should be continued. The name of the function is kept the same as in the
+        base class, such that the function is overwritten. Thus, the name cannot be changed.
+
+        Args:
+            - end_time (float): The end time of the simulation.
+
+        Returns:
+            - bool: True if the time step should be continued, else False.
+        """
+        current_time_corrected = self.main_model_part.ProcessInfo[KratosMultiphysics.TIME]
+        return current_time_corrected < end_time - sys.float_info.epsilon
