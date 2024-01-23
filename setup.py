@@ -2,6 +2,45 @@ from setuptools import setup
 from setuptools.command.install import install
 import os
 import shutil
+import sys
+import platform
+
+def set_install_requirements():
+    """
+    Creates kratos requirements list
+    """
+
+    kratos_version = ""
+    python_version_part = ""
+    platform_part = ""
+
+    # get platform part of wheel the name
+    if (sys.platform == "win32"):
+        kratos_version = "9.4.2a2457"
+        platform_part = "-win_amd64.whl"
+    elif (sys.platform == "linux"):
+        kratos_version = "9.4.3"
+        platform_part = "-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+
+    # get python version part of the wheel name
+    if (platform.python_version().startswith("3.9.")):
+        python_version_part = '-cp39-cp39'
+    elif (platform.python_version().startswith("3.10.")):
+        python_version_part = '-cp310-cp310'
+    elif (platform.python_version().startswith("3.11.")):
+        python_version_part = '-cp311-cp311'
+
+    requirements = [
+        f"KratosMultiphysics @ https://github.com/StemVibrations/StemKratos/raw/update_wheels/StemKratos/wheels/KratosMultiphysics-{kratos_version}{python_version_part}{platform_part}",
+        f"KratosLinearSolversApplication @ https://github.com/StemVibrations/StemKratos/raw/update_wheels/StemKratos/wheels/KratosLinearSolversApplication-{kratos_version}{python_version_part}{platform_part}",
+        f"KratosStructuralMechanicsApplication @ https://github.com/StemVibrations/StemKratos/raw/update_wheels/StemKratos/wheels/KratosStructuralMechanicsApplication-{kratos_version}{python_version_part}{platform_part}",
+        f"KratosGeoMechanicsApplication @ https://github.com/StemVibrations/StemKratos/raw/update_wheels/StemKratos/wheels/KratosGeoMechanicsApplication-{kratos_version}{python_version_part}{platform_part}"
+                    ]
+
+
+
+
+    return requirements
 
 class CustomStemInstallCommand(install):
     def run(self):
@@ -27,8 +66,11 @@ class CustomStemInstallCommand(install):
         # Move the entire directory
         shutil.move(source_path, destination_path)
 
+
+
 if __name__ == '__main__':
     setup(
-    cmdclass={
-        'install': CustomStemInstallCommand,
+        install_requires=set_install_requirements(),
+        cmdclass={
+            'install': CustomStemInstallCommand,
     })
