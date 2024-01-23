@@ -57,7 +57,7 @@ class CustomStemInstallCommand(install):
         This needs to be executed after the packages have been installed
         """
         # Custom logic to move data from my_package to another_package
-        source_path = os.path.join(self.install_lib, r'StemKratos\StemApplication')
+        source_path = os.path.join(self.install_lib, os.path.join('StemKratos,StemApplication'))
         destination_path = os.path.join(self.install_lib, 'KratosMultiphysics')
 
         # Ensure the destination directory exists
