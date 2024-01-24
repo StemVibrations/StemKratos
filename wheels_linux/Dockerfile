@@ -34,8 +34,12 @@ RUN git clone -b 'v5.5.1' --depth 1 https://github.com/MmgTools/mmg /workspace/m
     rm -r /workspace/mmg_5_5_1 && \
     cd /
 
-COPY . /workspace/kratos/Kratos
+RUN git clone --depth 1 https://github.com/KratosMultiphysics/Kratos.git /workspace/kratos/Kratos
 
-# RUN chmod +x /workspace/scripts/start.sh
+# overwrite the default configuration
+COPY build.sh /workspace/kratos/Kratos/scripts/wheels/linux
+COPY configure.sh /workspace/kratos/Kratos/scripts/wheels/linux
 
-# ENTRYPOINT ["/bin/bash", "/workspace/scripts/start.sh"]
+RUN chmod +x /workspace/kratos/Kratos/scripts/wheels/linux/build.sh
+
+ENTRYPOINT ["/bin/bash", "/workspace/kratos/Kratos/scripts/wheels/linux/build.sh"]
