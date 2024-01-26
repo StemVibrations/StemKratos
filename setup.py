@@ -10,16 +10,14 @@ def set_install_requirements():
     Creates kratos requirements list
     """
 
-    kratos_version = ""
+    kratos_version = "9.4.3.1"
     python_version_part = ""
     platform_part = ""
 
     # get platform part of wheel the name
     if (sys.platform == "win32"):
-        kratos_version = "9.4.2a2457"
         platform_part = "-win_amd64.whl"
     elif (sys.platform == "linux"):
-        kratos_version = "9.4.3"
         platform_part = "-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
 
     # get python version part of the wheel name
@@ -36,9 +34,6 @@ def set_install_requirements():
         f"KratosStructuralMechanicsApplication @ https://github.com/StemVibrations/StemKratos/raw/update_wheels/StemKratos/wheels/KratosStructuralMechanicsApplication-{kratos_version}{python_version_part}{platform_part}",
         f"KratosGeoMechanicsApplication @ https://github.com/StemVibrations/StemKratos/raw/update_wheels/StemKratos/wheels/KratosGeoMechanicsApplication-{kratos_version}{python_version_part}{platform_part}"
                     ]
-
-
-
 
     return requirements
 
