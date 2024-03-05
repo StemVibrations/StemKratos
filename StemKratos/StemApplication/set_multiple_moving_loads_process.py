@@ -29,6 +29,7 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
             new_model_part = self.clone_moving_condition_in_compute_model_part(new_model_part_name)
             moving_load_parameters.AddString("model_part_name", new_model_part_name)
             moving_load_parameters.RemoveValue("configuration")
+            moving_load_parameters.RemoveValue("activation_time")
             moving_load_parameters.RemoveValue("compute_model_part_name")
             moving_load_parameters.AddValue("offset", offset.values()[0])
 
@@ -74,14 +75,17 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         self.compute_model_part.RemoveConditions(KratosMultiphysics.TO_ERASE)
 
     def ExecuteInitialize(self):
-        for moving_load in self.moving_loads:
-            moving_load.ExecuteInitialize()
+        if self.compute_model_part.ProcessInfo[KratosMultiphysics.TIME] >= self.settings["activation_time"]:
+            for moving_load in self.moving_loads:
+                moving_load.ExecuteInitialize()
 
     def ExecuteInitializeSolutionStep(self):
+        if self.compute_model_part.ProcessInfo[KratosMultiphysics.TIME] >= self.settings["activation_time"]:
         for moving_load in self.moving_loads:
             moving_load.ExecuteInitializeSolutionStep()
 
     def ExecuteFinalizeSolutionStep(self):
+        if self.compute_model_part.ProcessInfo[KratosMultiphysics.TIME] >= self.settings["activation_time"]:
         for moving_load in self.moving_loads:
             moving_load.ExecuteFinalizeSolutionStep()
 
@@ -109,7 +113,8 @@ def Factory(settings, model):
                 "direction"               : [1,1,1],
                 "velocity"                : 1,
                 "origin"                  : [0.0,0.0,0.0],
-                "configuration"           : [0.0]
+                "configuration"           : [0.0],
+                "activation_time"         : 0.0
             }
             """
                                                      )

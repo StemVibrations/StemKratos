@@ -24,9 +24,9 @@ def run_stages(project_path,n_stages):
             parameters_stages[idx] = Kratos.Parameters(parameter_file.read())
 
     model = Kratos.Model()
-    stages = [analysis.StemGeoMechanicsAnalysis(model, stage_parameters) for stage_parameters in parameters_stages]
-
-    [stage.Run() for stage in stages]
+    for stage_parameters in parameters_stages:
+        stage = analysis.StemGeoMechanicsAnalysis(model, stage_parameters)
+        stage.Run()        
 
 
 if __name__ == "__main__":
