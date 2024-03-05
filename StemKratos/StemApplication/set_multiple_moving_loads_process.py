@@ -21,24 +21,27 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         self.root_model_part = self.model_part.GetRootModelPart()
         self.compute_model_part = self.root_model_part.GetSubModelPart(self.settings["compute_model_part_name"].GetString())
 
+        removeConditions = False
         count = 1
         for offset in settings["configuration"].values():
             print("Offset Python: ", offset.values()[0])
             moving_load_parameters = KratosMultiphysics.Parameters(settings).Clone()
             new_model_part_name = settings["model_part_name"].GetString().split('.')[-1] + "_cloned_" + str(count)
-            new_model_part = self.clone_moving_condition_in_compute_model_part(new_model_part_name)
-            moving_load_parameters.AddString("model_part_name", new_model_part_name)
-            moving_load_parameters.RemoveValue("configuration")
-            moving_load_parameters.RemoveValue("activation_time")
-            moving_load_parameters.RemoveValue("compute_model_part_name")
-            moving_load_parameters.AddValue("offset", offset.values()[0])
-
+            if self.compute_model_part.GetModelPart[new_model_part_name]: # check if cloned_model_part_exists
+                new_model_part = self.clone_moving_condition_in_compute_model_part(new_model_part_name)
+                moving_load_parameters.AddString("model_part_name", new_model_part_name)
+                moving_load_parameters.RemoveValue("configuration")
+                moving_load_parameters.RemoveValue("activation_time")
+                moving_load_parameters.RemoveValue("compute_model_part_name")
+                moving_load_parameters.AddValue("offset", offset.values()[0])
+                removeConditions = True
             # set a moving load on the location of each wheel
             self.moving_loads.append(StemSetMovingLoadProcess(new_model_part, moving_load_parameters))
             count += 1
 
         # remove condition of the original model part, as they are cloned
-        self.remove_cloned_conditions()
+        if removeConditions:
+            self.remove_cloned_conditions()
         
     def get_max_conditions_index(self):
         """
