@@ -6,6 +6,8 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
     def __init__(self, model_part, settings):
         super().__init__(model_part, settings)
         self.model_part = model_part
+        self.velocity = settings["velocity"].GetDouble()
+        self.mCurrentDistance = settings["offset"].GetDouble()        
 
     def ExecuteInitializeSolutionStep(self):
         precision = 1e-12
@@ -15,6 +17,14 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
             # a zero check is done to find the current location of the moving load
             if not all(abs(dimLoad) < precision for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
                 condition.SetValue(KSM.POINT_LOAD, self.model_part.GetValue(KSM.POINT_LOAD))
+    
+    def ExecuteFinalizeSolutionStep(self):
+        super().ExecuteFinalizeSolutionStep()
+        self.mCurrentDistance += self.model_part.ProcessInfo[KratosMultiphysics.DELTA_TIME] * self.velocity
+
+    def save(self, file_name):
+        with open(file_name, 'w') as fs:
+            fs.write(str(self.mCurrentDistance))
 
 def Factory(settings, Model):
     """

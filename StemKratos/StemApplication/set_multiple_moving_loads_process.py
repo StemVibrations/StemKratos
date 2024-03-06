@@ -1,8 +1,8 @@
 # Importing the Kratos Library
+import os.path
 import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
 from KratosMultiphysics.StemApplication.set_moving_load_process import StemSetMovingLoadProcess
-
 
 # condition name mapper, the key is the dimension and the number of nodes of the condition,
 # the value is the name of the condition
@@ -27,21 +27,32 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
             print("Offset Python: ", offset.values()[0])
             moving_load_parameters = KratosMultiphysics.Parameters(settings).Clone()
             new_model_part_name = settings["model_part_name"].GetString().split('.')[-1] + "_cloned_" + str(count)
-            if self.compute_model_part.GetModelPart[new_model_part_name]: # check if cloned_model_part_exists
+            moving_load_parameters.AddString("model_part_name", new_model_part_name)
+            moving_load_parameters.RemoveValue("configuration")
+            moving_load_parameters.RemoveValue("active")
+            moving_load_parameters.RemoveValue("compute_model_part_name")
+            
+            
+            if not self.compute_model_part.HasSubModelPart(new_model_part_name): # check if cloned_model_part_exists
                 new_model_part = self.clone_moving_condition_in_compute_model_part(new_model_part_name)
-                moving_load_parameters.AddString("model_part_name", new_model_part_name)
-                moving_load_parameters.RemoveValue("configuration")
-                moving_load_parameters.RemoveValue("activation_time")
-                moving_load_parameters.RemoveValue("compute_model_part_name")
                 moving_load_parameters.AddValue("offset", offset.values()[0])
                 removeConditions = True
-            # set a moving load on the location of each wheel
-            self.moving_loads.append(StemSetMovingLoadProcess(new_model_part, moving_load_parameters))
+            else:
+                new_model_part = self.compute_model_part.GetSubModelPart(new_model_part_name)
+                file_name = new_model_part_name + ".tmp"
+                if os.path.isfile(file_name):
+                    with open(file_name, 'r') as fo:
+                        read_offset = float(fo.readline())
+                    print("Read Offset", read_offset + offset.GetDouble()) 
+                    moving_load_parameters.AddDouble("offset", read_offset)
+                else:
+                    moving_load_parameters.AddValue("offset", offset.values()[0])
+                
+            self.moving_loads.append([StemSetMovingLoadProcess(new_model_part, moving_load_parameters), new_model_part_name])
             count += 1
 
         # remove condition of the original model part, as they are cloned
-        if removeConditions:
-            self.remove_cloned_conditions()
+        self.remove_cloned_conditions()
         
     def get_max_conditions_index(self):
         """
@@ -78,20 +89,30 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         self.compute_model_part.RemoveConditions(KratosMultiphysics.TO_ERASE)
 
     def ExecuteInitialize(self):
-        if self.compute_model_part.ProcessInfo[KratosMultiphysics.TIME] >= self.settings["activation_time"]:
+        if self.settings["active"].GetBool():
+            print("Execute Initialize")
             for moving_load in self.moving_loads:
-                moving_load.ExecuteInitialize()
+                moving_load[0].ExecuteInitialize()
 
     def ExecuteInitializeSolutionStep(self):
-        if self.compute_model_part.ProcessInfo[KratosMultiphysics.TIME] >= self.settings["activation_time"]:
-        for moving_load in self.moving_loads:
-            moving_load.ExecuteInitializeSolutionStep()
+        if self.settings["active"].GetBool():
+            print("ExecuteInitializeSolutionStep")
+            for moving_load in self.moving_loads:
+                moving_load[0].ExecuteInitializeSolutionStep()
 
     def ExecuteFinalizeSolutionStep(self):
-        if self.compute_model_part.ProcessInfo[KratosMultiphysics.TIME] >= self.settings["activation_time"]:
-        for moving_load in self.moving_loads:
-            moving_load.ExecuteFinalizeSolutionStep()
+        if self.settings["active"].GetBool():
+            print("ExecuteFinalizeSolutionStep")
+            for moving_load in self.moving_loads:
+                moving_load[0].ExecuteFinalizeSolutionStep()
 
+    def ExecuteFinalize(self):
+        if self.settings["active"].GetBool():
+            print("ExecuteFinalize")
+            for moving_load in self.moving_loads:
+                moving_load[0].ExecuteFinalize()
+                file_name = moving_load[1] + ".tmp"
+                moving_load[0].save(file_name)
 
 def Factory(settings, model):
     """
@@ -117,7 +138,7 @@ def Factory(settings, model):
                 "velocity"                : 1,
                 "origin"                  : [0.0,0.0,0.0],
                 "configuration"           : [0.0],
-                "activation_time"         : 0.0
+                "active"                  : true
             }
             """
                                                      )
