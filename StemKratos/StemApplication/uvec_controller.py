@@ -59,6 +59,7 @@ class StemUvecController:
         uvec_json = KratosMultiphysics.Parameters(self.callback_function(json_data.WriteJsonString()))
         for axle in self.axle_model_parts:
             axle_number = (axle.Name.split("_")[-1])
+            print(f"load_axis = {uvec_json['loads'][axle_number].GetVector()}")
             axle.SetValue(KSM.POINT_LOAD, uvec_json["loads"][axle_number].GetVector())
         return uvec_json
 

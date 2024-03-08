@@ -27,9 +27,20 @@ class Utils():
             parameters = Kratos.Parameters(parameter_file.read())
 
         model = Kratos.Model()
+
+
         stage = analysis.StemGeoMechanicsAnalysis(model, parameters)
 
+        model.GetModelPart("PorousDomain").ProcessInfo.SetValue(Kratos.IS_RESTARTED, True)
+        tmp = model.GetModelPart("PorousDomain").ProcessInfo.GetValue(Kratos.IS_RESTARTED)
+
+        with open("ProjectParameters_stage2.json", 'r') as parameter_file:
+            parameters2 = Kratos.Parameters(parameter_file.read())
+
+        stage2 = analysis.StemGeoMechanicsAnalysis(model, parameters2)
+
         stage.Run()
+        stage2.Run()
 
         # change working directory back to original working directory
         os.chdir(cwd)

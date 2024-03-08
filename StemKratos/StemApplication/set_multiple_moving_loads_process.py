@@ -21,18 +21,43 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         self.root_model_part = self.model_part.GetRootModelPart()
         self.compute_model_part = self.root_model_part.GetSubModelPart(self.settings["compute_model_part_name"].GetString())
 
+        print(f"aron_conditions{[condition.Id for condition in self.compute_model_part.Conditions]}")
+
         count = 1
         for offset in settings["configuration"].values():
-            print("Offset Python: ", offset.values()[0])
-            moving_load_parameters = KratosMultiphysics.Parameters(settings).Clone()
             new_model_part_name = settings["model_part_name"].GetString().split('.')[-1] + "_cloned_" + str(count)
+            # new_model_part_name = settings["model_part_name"].GetString()
+            #
+            moving_load_parameters = KratosMultiphysics.Parameters(settings).Clone()
+            # new_model_part = self.clone_moving_condition_in_compute_model_part(new_model_part_name)
+            # moving_load_parameters.AddString("model_part_name", new_model_part_name)
+            # moving_load_parameters.RemoveValue("configuration")
+            # moving_load_parameters.RemoveValue("compute_model_part_name")
+            # moving_load_parameters.AddValue("offset", offset.values()[0])
+
             new_model_part = self.clone_moving_condition_in_compute_model_part(new_model_part_name)
+            # only add new model part if it is not already added
+            # if not self.compute_model_part.HasSubModelPart(new_model_part_name):
+            #     # moving_load_parameters = KratosMultiphysics.Parameters(settings).Clone()
+            #     new_model_part = self.clone_moving_condition_in_compute_model_part(new_model_part_name)
+            #
+            #
+            #     # set a moving load on the location of each wheel
+            # else:
+            #     new_model_part = self.clone_moving_condition_in_compute_model_part(new_model_part_name)
+            #     # new_model_part = self.compute_model_part.GetSubModelPart(new_model_part_name)
+            #     print(f"aron_nodes{[node.Id for node in new_model_part.GetNodes()]}")
+            #
+            #     # moving_load_parameters = KratosMultiphysics.Parameters(settings).Clone()
+            #     # moving_load_parameters.RemoveValue("compute_model_part_name")
+            #     # moving_load_parameters.AddValue("offset", offset.values()[0])
+            #     # moving_load_parameters = new_model_part
+
             moving_load_parameters.AddString("model_part_name", new_model_part_name)
             moving_load_parameters.RemoveValue("configuration")
             moving_load_parameters.RemoveValue("compute_model_part_name")
             moving_load_parameters.AddValue("offset", offset.values()[0])
 
-            # set a moving load on the location of each wheel
             self.moving_loads.append(StemSetMovingLoadProcess(new_model_part, moving_load_parameters))
             count += 1
 
@@ -53,7 +78,12 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         """
         This function clones the moving load condition of the current model part to a new model part
         """
-        new_model_part = self.compute_model_part.CreateSubModelPart(new_body_part_name)
+
+        if not self.compute_model_part.HasSubModelPart(new_body_part_name):
+            new_model_part = self.compute_model_part.CreateSubModelPart(new_body_part_name)
+        else:
+            new_model_part = self.compute_model_part.GetSubModelPart(new_body_part_name)
+
         new_model_part.SetValue(KSM.POINT_LOAD, self.settings["load"].GetVector())
         node_ids = [node.Id for node in self.model_part.GetNodes()]
         new_model_part.AddNodes(node_ids)
@@ -61,11 +91,44 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         for condition in self.model_part.Conditions:
             index += 1
             node_ids = [node.Id for node in condition.GetNodes()]
-            print("Node ids: ", node_ids)
+            # print("Node ids: ", node_ids)
             geom = condition.GetGeometry()
             moving_load_name = CONDITION_NAME_MAP[(geom.WorkingSpaceDimension(), geom.PointsNumber())]
 
             new_model_part.CreateNewCondition(moving_load_name, index, node_ids, condition.Properties)
+
+        # else:
+        #     new_model_part = self.compute_model_part.GetSubModelPart(new_body_part_name)
+        #     new_model_part.SetValue(KSM.POINT_LOAD, self.settings["load"].GetVector())
+
+            # node_ids = [node.Id for node in self.model_part.GetNodes()]
+            # new_model_part.AddNodes(node_ids)
+            # index = self.get_max_conditions_index()
+            # for condition in self.model_part.Conditions:
+            #     index += 1
+            #     node_ids = [node.Id for node in condition.GetNodes()]
+            #     # print("Node ids: ", node_ids)
+            #     geom = condition.GetGeometry()
+            #     moving_load_name = CONDITION_NAME_MAP[(geom.WorkingSpaceDimension(), geom.PointsNumber())]
+            #
+            #     new_model_part.CreateNewCondition(moving_load_name, index, node_ids, condition.Properties)
+
+
+
+
+
+        # new_model_part.SetValue(KSM.POINT_LOAD, self.settings["load"].GetVector())
+        # node_ids = [node.Id for node in self.model_part.GetNodes()]
+        # new_model_part.AddNodes(node_ids)
+        # index = self.get_max_conditions_index()
+        # for condition in self.model_part.Conditions:
+        #     index += 1
+        #     node_ids = [node.Id for node in condition.GetNodes()]
+        #     print("Node ids: ", node_ids)
+        #     geom = condition.GetGeometry()
+        #     moving_load_name = CONDITION_NAME_MAP[(geom.WorkingSpaceDimension(), geom.PointsNumber())]
+        #
+        #     new_model_part.CreateNewCondition(moving_load_name, index, node_ids, condition.Properties)
         return new_model_part
 
     def remove_cloned_conditions(self):
@@ -84,6 +147,12 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
     def ExecuteFinalizeSolutionStep(self):
         for moving_load in self.moving_loads:
             moving_load.ExecuteFinalizeSolutionStep()
+
+    def ExecuteFinalize(self):
+        for i in range(len(self.moving_loads)):
+            self.moving_loads[i].ExecuteFinalize()
+            self.moving_loads[i] = None
+            # moving_load = None
 
 
 def Factory(settings, model):

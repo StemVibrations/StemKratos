@@ -13,6 +13,7 @@ def test_call_uvec():
 
     model, stage = Utils.run_stage(test_file_dir, parameter_file_name)
 
+
     assert assert_files_equal(os.path.join(test_file_dir, "_output/porous_computational_model_part"),
                               os.path.join(test_file_dir, "output/porous_computational_model_part"))
 
