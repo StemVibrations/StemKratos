@@ -34,6 +34,8 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
             moving_load_parameters.RemoveValue("active")
             moving_load_parameters.RemoveValue("compute_model_part_name")
             moving_load_parameters.AddValue("offset", offset.values()[0])
+            moving_load_parameters.AddBool("serialize", True)
+            moving_load_parameters.AddBool("clear_at_finalize", True)
 
             self.moving_loads.append(StemSetMovingLoadProcess(new_model_part, moving_load_parameters))
             count += 1

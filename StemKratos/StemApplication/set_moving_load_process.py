@@ -4,21 +4,37 @@ import KratosMultiphysics.StructuralMechanicsApplication as KSM
 class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
 
     def __init__(self, model_part, settings):
+        #
+        self.__do_serialize = settings["serialize"].GetBool()
+        self.__do_clear = settings["clear_at_finalize"].GetBool()
+
+        # remove the serialize and clear_at_finalize parameters from the settings
+        settings.RemoveValue("serialize")
+        settings.RemoveValue("clear_at_finalize")
+
         super().__init__(model_part, settings)
         self.model_part = model_part
-        self.serializer = KratosMultiphysics.FileSerializer(f"set_moving_load_process_{self.model_part.Name}",
-                                                            KratosMultiphysics.SerializerTraceType.SERIALIZER_NO_TRACE)
 
+        if self.__do_serialize:
+            self.serializer = KratosMultiphysics.FileSerializer(f"set_moving_load_process_{self.model_part.Name}",
+                                                                KratosMultiphysics.SerializerTraceType.SERIALIZER_NO_TRACE)
 
     def ExecuteInitialize(self):
         super().ExecuteInitialize()
 
-        #todo use a different check
-        time = self.model_part.ProcessInfo.GetValue(KratosMultiphysics.TIME)
+        # #todo use a different check
+        # time = self.model_part.ProcessInfo.GetValue(KratosMultiphysics.TIME)
+        #
+        # # only load process if time is greater than 0, i.e. not in the first stage of the simulation
+        # if time > 0:
+        #     self.serializer.Load(f"set_moving_load_process_{self.model_part.Name}", self)
 
-        # only load process if time is greater than 0, i.e. not in the first stage of the simulation
-        if time > 0:
-            self.serializer.Load(f"set_moving_load_process_{self.model_part.Name}", self)
+        if self.__do_serialize:
+            # load if process is restarted
+            if self.model_part.ProcessInfo[KratosMultiphysics.STEP] > 0:
+              #  self.model_part.ProcessInfo[KratosMultiphysics.IS_RESTARTED] = True
+              print("Loading serializer")
+              self.serializer.Load(f"set_moving_load_process_{self.model_part.Name}", self)
 
     def ExecuteInitializeSolutionStep(self):
         precision = 1e-12
@@ -32,17 +48,19 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
     def ExecuteFinalize(self):
         super().ExecuteFinalize()
 
-        # save the moving load process to file
-        self.serializer.Save(f"set_moving_load_process_{self.model_part.Name}", self)
+        if self.__do_serialize:
+            # save the moving load process to file
+            self.serializer.Save(f"set_moving_load_process_{self.model_part.Name}", self)
 
-        # remove the nodes and conditions from the model part as required for multistage analysis
-        for node in self.model_part.Nodes:
-            node.Set(KratosMultiphysics.TO_ERASE, True)
-        self.model_part.RemoveNodes(KratosMultiphysics.TO_ERASE)
+        if self.__do_clear:
+            # remove the nodes and conditions from the model part as required for multistage analysis
+            for node in self.model_part.Nodes:
+                node.Set(KratosMultiphysics.TO_ERASE, True)
+            self.model_part.RemoveNodes(KratosMultiphysics.TO_ERASE)
 
-        for condition in self.model_part.Conditions:
-            condition.Set(KratosMultiphysics.TO_ERASE, True)
-        self.model_part.RemoveConditions(KratosMultiphysics.TO_ERASE)
+            for condition in self.model_part.Conditions:
+                condition.Set(KratosMultiphysics.TO_ERASE, True)
+            self.model_part.RemoveConditions(KratosMultiphysics.TO_ERASE)
 
 
 def Factory(settings, Model):
@@ -66,7 +84,9 @@ def Factory(settings, Model):
                 "direction"       : [1,1,1],
                 "velocity"        : 1,
                 "origin"          : [0.0,0.0,0.0],
-                "offset"          : 0.0
+                "offset"          : 0.0,
+                "serialize"       : False,
+                "clear_at_finalize" : False
             }
             """
                                                      )

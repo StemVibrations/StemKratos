@@ -38,6 +38,25 @@ class UPwUvecSolver(UPwGeoSolver):
 
         return this_defaults
 
+    def PrepareModelPart(self):
+        """This function prepares the ModelPart for being used by the PythonSolver
+        """
+        # Set ProcessInfo variables
+        self.main_model_part.ProcessInfo.SetValue(GeoMechanicsApplication.TIME_UNIT_CONVERTER, 1.0)
+        self.main_model_part.ProcessInfo.SetValue(GeoMechanicsApplication.NODAL_SMOOTHING,
+                                                  self.settings["nodal_smoothing"].GetBool())
+
+
+        # step = self.main_model_part.ProcessInfo.GetValue(KratosMultiphysics.STEP)
+        if not self.main_model_part.ProcessInfo[KratosMultiphysics.IS_RESTARTED]:
+            ## Executes the check and prepare model process (Create computing_model_part and set constitutive law)
+            self._ExecuteCheckAndPrepare()
+            ## Set buffer size
+            self._SetBufferSize()
+
+        if not self.model.HasModelPart(self.settings["model_part_name"].GetString()):
+            self.model.AddModelPart(self.main_model_part)
+
     def _ConstructSolver(self, builder_and_solver, strategy_type):
         """
         This function constructs the solver according to the solver settings. If newton_raphson_with_uvec is selected,
