@@ -6,8 +6,19 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
     def __init__(self, model_part, settings):
         super().__init__(model_part, settings)
         self.model_part = model_part
-        self.velocity = settings["velocity"].GetDouble()
-        self.mCurrentDistance = settings["offset"].GetDouble()        
+        self.serializer = KratosMultiphysics.FileSerializer(f"set_moving_load_process_{self.model_part.Name}",
+                                                            KratosMultiphysics.SerializerTraceType.SERIALIZER_NO_TRACE)
+
+
+    def ExecuteInitialize(self):
+        super().ExecuteInitialize()
+
+        #todo use a different check
+        time = self.model_part.ProcessInfo.GetValue(KratosMultiphysics.TIME)
+
+        # only load process if time is greater than 0, i.e. not in the first stage of the simulation
+        if time > 0:
+            self.serializer.Load(f"set_moving_load_process_{self.model_part.Name}", self)
 
     def ExecuteInitializeSolutionStep(self):
         precision = 1e-12
@@ -17,14 +28,22 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
             # a zero check is done to find the current location of the moving load
             if not all(abs(dimLoad) < precision for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
                 condition.SetValue(KSM.POINT_LOAD, self.model_part.GetValue(KSM.POINT_LOAD))
-    
-    def ExecuteFinalizeSolutionStep(self):
-        super().ExecuteFinalizeSolutionStep()
-        self.mCurrentDistance += self.model_part.ProcessInfo[KratosMultiphysics.DELTA_TIME] * self.velocity
 
-    def save(self, file_name):
-        with open(file_name, 'w') as fs:
-            fs.write(str(self.mCurrentDistance))
+    def ExecuteFinalize(self):
+        super().ExecuteFinalize()
+
+        # save the moving load process to file
+        self.serializer.Save(f"set_moving_load_process_{self.model_part.Name}", self)
+
+        # remove the nodes and conditions from the model part as required for multistage analysis
+        for node in self.model_part.Nodes:
+            node.Set(KratosMultiphysics.TO_ERASE, True)
+        self.model_part.RemoveNodes(KratosMultiphysics.TO_ERASE)
+
+        for condition in self.model_part.Conditions:
+            condition.Set(KratosMultiphysics.TO_ERASE, True)
+        self.model_part.RemoveConditions(KratosMultiphysics.TO_ERASE)
+
 
 def Factory(settings, Model):
     """
