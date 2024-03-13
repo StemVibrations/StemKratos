@@ -55,6 +55,8 @@ def assert_files_equal(exact_folder: Union[str, Path], test_folder: Union[str,Pa
     # reads all files in directory
     files = os.listdir(exact_folder)
 
+    if len(files) == 0:
+        return False
     # checks if all files in exact_folder are in test_folder
     for file in files:
         with open(os.path.join(exact_folder, file)) as fi:
@@ -63,6 +65,6 @@ def assert_files_equal(exact_folder: Union[str, Path], test_folder: Union[str,Pa
             test = fi.read()
 
         # check if files are equal
-        if exact == test:
-            return True
-    return False
+        if exact != test:
+            return False
+    return True

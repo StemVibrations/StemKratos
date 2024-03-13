@@ -62,9 +62,6 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
             if not all(abs(dimLoad) < precision for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
                 condition.SetValue(KSM.POINT_LOAD, self.model_part.GetValue(KSM.POINT_LOAD))
 
-            else:
-                condition.SetValue(KSM.POINT_LOAD, [0,0,0])
-
     def ExecuteFinalize(self):
         super().ExecuteFinalize()
 
