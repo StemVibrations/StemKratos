@@ -1,16 +1,14 @@
 import os
 from pathlib import Path
-import shutil
-from tests.utils import Utils, assert_files_equal
+from tests.utils import assert_files_equal
 
 import KratosMultiphysics as Kratos
-from StemKratos.StemApplication.run_multiple_stages import run_stages
 import KratosMultiphysics.StemApplication.geomechanics_analysis as analysis
 
 
-def test_call_uvec_multi_stage2():
+def test_call_uvec_multi_stage():
     """
-    Test the call of UVEC against benchmark
+    Test the call of the UVEC in a multi-stage analysis
     """
     test_file_dir = r"tests/test_data/input_data_multi_stage_uvec"
 
@@ -49,5 +47,8 @@ def test_call_uvec_multi_stage2():
     # remove the stage vtk output dir if it is empty
     if not os.listdir(stage_vtk_output_dir):
         os.rmdir(stage_vtk_output_dir)
+
+    expected_output_dir = Path("tests/test_data/input_data_multi_stage_uvec/_output/all")
+    assert assert_files_equal(expected_output_dir, main_vtk_output_dir)
 
 

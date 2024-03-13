@@ -1,4 +1,7 @@
 import os
+from typing import Union
+from pathlib import Path
+
 import KratosMultiphysics as Kratos
 import KratosMultiphysics.StemApplication.geomechanics_analysis as analysis
 
@@ -37,7 +40,7 @@ class Utils():
         return model, stage
 
 
-def assert_files_equal(exact_folder: str, test_folder: str) -> bool:
+def assert_files_equal(exact_folder: Union[str, Path], test_folder: Union[str,Path]) -> bool:
     r"""
     Compares two folders containing files and returns True if all files are equal, False otherwise.
 
