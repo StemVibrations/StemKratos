@@ -1,40 +1,57 @@
 import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
 
-class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
 
-    def __init__(self, model_part, settings):
-        #
+class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
+    """
+    This process sets the moving load condition.
+
+    Inheritance:
+        - :class:`KratosMultiphysics.StructuralMechanicsApplication.SetMovingLoadProcess`
+
+    Attributes:
+        - __do_serialize (bool): bool which indicates if the process is to be serialized
+        - __do_clear (bool): bool which indicates if the process is to be cleared at finalize
+        - model_part (KratosMultiphysics.ModelPart): model part containing the conditions
+        - __serializer (KratosMultiphysics.FileSerializer): serializer for the process
+    """
+
+    def __init__(self, model_part: KratosMultiphysics.ModelPart, settings: KratosMultiphysics.Parameters):
+        """
+        This process sets the moving load condition.
+
+        Args:
+            - model_part (KratosMultiphysics.ModelPart): model part containing the conditions
+            - settings (KratosMultiphysics.Parameters): settings of the process
+
+        """
         self.__do_serialize = settings["serialize"].GetBool()
         self.__do_clear = settings["clear_at_finalize"].GetBool()
 
-        # remove the serialize and clear_at_finalize parameters from the settings
+        # remove the serialize and clear_at_finalize parameters from the settings as they are not used in the base class
         settings.RemoveValue("serialize")
         settings.RemoveValue("clear_at_finalize")
 
         super().__init__(model_part, settings)
         self.model_part = model_part
 
+        # initialize serializer
         if self.__do_serialize:
-            self.serializer = KratosMultiphysics.FileSerializer(f"set_moving_load_process_{self.model_part.Name}",
-                                                                KratosMultiphysics.SerializerTraceType.SERIALIZER_NO_TRACE)
+            self.__serializer = KratosMultiphysics.FileSerializer(
+                f"set_moving_load_process_{self.model_part.Name}",
+                KratosMultiphysics.SerializerTraceType.SERIALIZER_NO_TRACE)
 
     def ExecuteInitialize(self):
+        """
+        This function initializes the process. If the simulation is further than the first step,
+        the set_moving_load_process is loaded. This function name cannot be changed. This name is recognised by Kratos.
+        """
+
         super().ExecuteInitialize()
-
-        # #todo use a different check
-        # time = self.model_part.ProcessInfo.GetValue(KratosMultiphysics.TIME)
-        #
-        # # only load process if time is greater than 0, i.e. not in the first stage of the simulation
-        # if time > 0:
-        #     self.serializer.Load(f"set_moving_load_process_{self.model_part.Name}", self)
-
         if self.__do_serialize:
             # load if process is restarted
             if self.model_part.ProcessInfo[KratosMultiphysics.STEP] > 0:
-              #  self.model_part.ProcessInfo[KratosMultiphysics.IS_RESTARTED] = True
-              print("Loading serializer")
-              self.serializer.Load(f"set_moving_load_process_{self.model_part.Name}", self)
+                self.__serializer.Load(f"set_moving_load_process_{self.model_part.Name}", self)
 
     def ExecuteInitializeSolutionStep(self):
         precision = 1e-12
@@ -45,12 +62,15 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
             if not all(abs(dimLoad) < precision for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
                 condition.SetValue(KSM.POINT_LOAD, self.model_part.GetValue(KSM.POINT_LOAD))
 
+            else:
+                condition.SetValue(KSM.POINT_LOAD, [0,0,0])
+
     def ExecuteFinalize(self):
         super().ExecuteFinalize()
 
         if self.__do_serialize:
             # save the moving load process to file
-            self.serializer.Save(f"set_moving_load_process_{self.model_part.Name}", self)
+            self.__serializer.Save(f"set_moving_load_process_{self.model_part.Name}", self)
 
         if self.__do_clear:
             # remove the nodes and conditions from the model part as required for multistage analysis
