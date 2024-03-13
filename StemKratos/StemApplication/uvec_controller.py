@@ -12,14 +12,6 @@ class StemUvecController:
         self.uvec_method= uvec_data["uvec_method"].GetString()
         self.uvec_base_model_part = uvec_data["uvec_model_part"].GetString()
 
-        print("============================================================")
-        print("STEM UVEC CONTROLLER")
-        print("============================================================")
-        print(" uvec_path: ", self.uvec_path)
-        print(" uvec_method: ", self.uvec_method)
-        print(" uvec_base_model_part: ", self.uvec_base_model_part)
-        print("============================================================")
-
         # Create a spec object for the module
         module_name = os.path.basename(self.uvec_path).split(".")[0]
         spec = importlib.util.spec_from_file_location(module_name, self.uvec_path)
@@ -36,7 +28,6 @@ class StemUvecController:
         for part in model_part.SubModelParts:
             if (self.uvec_base_model_part + "_cloned_") in part.Name:
                 self.axle_model_parts.append(model_part.GetSubModelPart(part.Name))
-                print("Info: STEM_UVEC_CONTROLLER:: Added ", part.Name)
 
     def update_dt(self, json_data):
         if not json_data.Has("dt"):
@@ -87,18 +78,3 @@ class StemUvecController:
             self.update_uvec_variable_from_kratos(json_data, axle_number, axle, "u", KratosMultiphysics.DISPLACEMENT)
             self.update_uvec_variable_from_kratos(json_data, axle_number, axle, "theta", KratosMultiphysics.ROTATION)
         return json_data
-
-if __name__ == "__main__":
-    import KratosMultiphysics as KM
-
-    uvec_params = KM.Parameters("""{
-        "uvec_path"                     :     "C:/Users/jdnut/Desktop/StemPython/UVEC/my_sample_uvec.py",
-        "uvec_method"				    :     "uvec_test",
-        "uvec_data"						:     "{'dt': 0.0, 'u':{}, 'theta':{}, 'loads':{}, 'parameters' :{}, 'state':{}}"
-    }""")
-
-    controller = StemUvecController(uvec_params)
-    json_test_string = json.dumps({"test": "test"})
-    print(json.loads(json_test_string))
-    json_test_string = controller.callback_function(json_test_string)
-    print(json.loads(json_test_string))
