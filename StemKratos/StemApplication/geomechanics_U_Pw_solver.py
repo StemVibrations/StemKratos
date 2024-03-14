@@ -40,23 +40,18 @@ class UPwUvecSolver(UPwGeoSolver):
 
     def PrepareModelPart(self):
         """
-        This function prepares the main ModelPart for being used by the PythonSolver
+        This function makes sure that the current STEP of the simulation is maintained between stages
         """
-        # Set ProcessInfo variables
-        self.main_model_part.ProcessInfo.SetValue(GeoMechanicsApplication.TIME_UNIT_CONVERTER, 1.0)
-        self.main_model_part.ProcessInfo.SetValue(GeoMechanicsApplication.NODAL_SMOOTHING,
-                                                  self.settings["nodal_smoothing"].GetBool())
 
-        # only execute if the model is not restarted
-        if not self.main_model_part.ProcessInfo[KratosMultiphysics.IS_RESTARTED]:
-            ## Executes the check and prepare model process (Create computing_model_part and set constitutive law)
-            self._ExecuteCheckAndPrepare()
-            ## Set buffer size
-            self._SetBufferSize()
+        # get current step
+        current_step = self.main_model_part.ProcessInfo[KratosMultiphysics.STEP]
 
-        # add main model part to the model if it does not exist
-        if not self.model.HasModelPart(self.settings["model_part_name"].GetString()):
-            self.model.AddModelPart(self.main_model_part)
+        # call base class function
+        super().PrepareModelPart()
+
+        # set current step
+        self.main_model_part.ProcessInfo.SetValue(KratosMultiphysics.STEP, current_step)
+
 
     def _ConstructSolver(self, builder_and_solver, strategy_type):
         """
