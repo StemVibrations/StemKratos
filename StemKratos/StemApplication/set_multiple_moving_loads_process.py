@@ -48,9 +48,6 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         # add moving load processes
         self.__add_moving_load_processes()
 
-        # # remove condition of the original model part, as they are cloned
-        self.__remove_cloned_conditions()
-
     def __add_moving_load_processes(self):
         """
         This function adds the moving load processes to the model part
@@ -92,10 +89,7 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         """
 
         # create new model part or get existing one
-        if not self.compute_model_part.HasSubModelPart(new_body_part_name):
-            new_model_part = self.compute_model_part.CreateSubModelPart(new_body_part_name)
-        else:
-            new_model_part = self.compute_model_part.GetSubModelPart(new_body_part_name)
+        new_model_part = self.compute_model_part.CreateSubModelPart(new_body_part_name)
 
         # set the point load to the value of the model part
         new_model_part.SetValue(KSM.POINT_LOAD, self.settings["load"].GetVector())
@@ -158,6 +152,10 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
             for i in reversed(range(len(self.moving_loads))):
                 # finalize the moving load process
                 self.moving_loads[i].ExecuteFinalize()
+
+                # remove cloned modelpart from the system
+                self.compute_model_part.RemoveSubModelPart(self.moving_loads[i].model_part.Name)
+
                 # remove the moving load process, this is required for multistage analysis
                 del self.moving_loads[i]
 
