@@ -1,7 +1,6 @@
 import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
 
-import numpy as np
 class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
     """
     This process sets the moving load condition.
@@ -79,6 +78,8 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
             for condition in self.model_part.Conditions:
                 condition.Set(KratosMultiphysics.TO_ERASE, True)
             self.model_part.RemoveConditions(KratosMultiphysics.TO_ERASE)
+
+            self.model_part.Clear()
 
 
 def Factory(settings, Model):

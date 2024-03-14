@@ -155,11 +155,11 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         multistage analysis
         """
         if self.settings["active"].GetBool():
-            for i in range(len(self.moving_loads)):
+            for i in reversed(range(len(self.moving_loads))):
                 # finalize the moving load process
                 self.moving_loads[i].ExecuteFinalize()
                 # remove the moving load process, this is required for multistage analysis
-                self.moving_loads[i] = None
+                del self.moving_loads[i]
 
 def Factory(settings, model):
     """
