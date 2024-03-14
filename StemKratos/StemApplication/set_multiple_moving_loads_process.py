@@ -49,7 +49,7 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         self.__add_moving_load_processes()
 
         # # remove condition of the original model part, as they are cloned
-        # self.__remove_cloned_conditions()
+        self.__remove_cloned_conditions()
 
     def __add_moving_load_processes(self):
         """
