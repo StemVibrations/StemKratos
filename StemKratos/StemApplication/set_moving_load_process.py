@@ -56,11 +56,11 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
     def ExecuteInitializeSolutionStep(self):
         precision = 1e-12
         super().ExecuteInitializeSolutionStep()
-        for condition in self.model_part.Conditions:
-            # update the of load to the value of the model part if the load is not zero.
-            # a zero check is done to find the current location of the moving load
-            if not all(abs(dimLoad) < precision for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
-                condition.SetValue(KSM.POINT_LOAD, self.model_part.GetValue(KSM.POINT_LOAD))
+        # for condition in self.model_part.Conditions:
+        #     # update the of load to the value of the model part if the load is not zero.
+        #     # a zero check is done to find the current location of the moving load
+        #     if not all(abs(dimLoad) < precision for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
+        #         condition.SetValue(KSM.POINT_LOAD, self.model_part.GetValue(KSM.POINT_LOAD))
 
     def ExecuteFinalize(self):
         super().ExecuteFinalize()
