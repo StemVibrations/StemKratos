@@ -18,10 +18,6 @@ class Utils():
 
         """
 
-        test_file_dir = r"tests/test_data/input_data_expected_moving_load_uvec"
-
-        parameter_file_name = "ProjectParameters_stage1.json"
-
         # set stage parameters
         cwd = os.getcwd()
         os.chdir(project_path)

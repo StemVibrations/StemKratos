@@ -159,9 +159,6 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
                 # finalize the moving load process
                 self.moving_loads[i].ExecuteFinalize()
 
-                # # remove cloned modelpart from the system
-                # self.compute_model_part.RemoveSubModelPart(self.moving_loads[i].model_part.Name)
-
                 # remove the moving load process, this is required for multistage analysis
                 del self.moving_loads[i]
 
