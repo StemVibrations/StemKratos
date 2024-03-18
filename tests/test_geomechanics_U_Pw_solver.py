@@ -59,7 +59,5 @@ def test_PrepareModelPart():
     # call function
     uvec_solver.PrepareModelPart()
 
-    super(uvec_solver).PrepareModelPart()
-
     # check if the current step is maintained
     assert uvec_solver.main_model_part.ProcessInfo[Kratos.STEP] == 5
