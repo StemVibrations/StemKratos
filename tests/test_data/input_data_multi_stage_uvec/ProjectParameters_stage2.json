@@ -30,8 +30,8 @@
         "reform_dofs_at_each_step":           false,
         "nodal_smoothing":                    false,
         "block_builder":                      true,
-        "solution_type":                      "dynamic",
-        "scheme_type":                        "Newmark",
+        "solution_type":                      "quasi-static",
+        "scheme_type":                        "backward-euler",
         "reset_displacements":                false,
         "newmark_beta":                       0.25,
         "newmark_gamma":                      0.5,
@@ -73,7 +73,7 @@
 			"uvec_path"                     :     "my_sample_uvec.py",
 			"uvec_method"				    :     "uvec_test_stage_2",
 			"uvec_model_part"				:	  "moving_load",
-			"uvec_data"						:     {"dt": 0.0, "u":{}, "theta":{}, "loads":{"1": [0, -30000, 0], "2": [0, -10000, 0]}, "parameters" :{}, "state":{}}
+			"uvec_data"						:     {"dt": 0.0, "u":{}, "theta":{}, "loads":{}, "parameters" :{}, "state":{"previous_time_index": 100, "previous_time":  1}}
 		}
 
     },

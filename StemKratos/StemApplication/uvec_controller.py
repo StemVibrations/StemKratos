@@ -1,15 +1,19 @@
+from typing import Dict, Any
+
 import json
 import os
 import importlib.util
+
 import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
+
 
 class StemUvecController:
 
     def __init__(self, uvec_data, model_part):
 
         self.uvec_path = uvec_data["uvec_path"].GetString()
-        self.uvec_method= uvec_data["uvec_method"].GetString()
+        self.uvec_method = uvec_data["uvec_method"].GetString()
         self.uvec_base_model_part = uvec_data["uvec_model_part"].GetString()
 
         # Create a spec object for the module
@@ -23,7 +27,7 @@ class StemUvecController:
         spec.loader.exec_module(uvec)
         self.callback_function = getattr(uvec, self.uvec_method)
 
-        #get correct conditions
+        # get correct conditions
         self.axle_model_parts = []
         for part in model_part.SubModelParts:
             if (self.uvec_base_model_part + "_cloned_") in part.Name:
@@ -40,14 +44,30 @@ class StemUvecController:
             json_data.AddEmptyValue("time_index")
         json_data.AddInt("time_index", self.axle_model_parts[0].ProcessInfo[KratosMultiphysics.STEP] - 1)
 
-    def execute_uvec_update_kratos(self, json_data):
+    def execute_uvec_update_kratos(self, json_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        This function calls the uvec model and updates the Kratos model with the result.
+
+        Args:
+            - json_data (Dict[str, Any]): input data for the uvec model
+
+        Returns:
+            - Dict[str, Any]: output data from the uvec model
+
+        """
+
+        # add empty variables to uvec input data
         # make sure all axles have required empty data structure
         required_axle_parameters = ["u", "theta", "loads"]
         for axle in self.axle_model_parts:
             axle_number = (axle.Name.split("_")[-1])
             for variable_json in required_axle_parameters:
-                self.add_empty_variable_to_parameters(json_data, axle_number, axle, variable_json)
+                self.add_empty_variable_to_parameters(json_data, axle_number, variable_json)
+
+        # call uvec function
         uvec_json = KratosMultiphysics.Parameters(self.callback_function(json_data.WriteJsonString()))
+
+        # add loads from uvec to the model
         for axle in self.axle_model_parts:
             axle_number = (axle.Name.split("_")[-1])
             axle.SetValue(KSM.POINT_LOAD, uvec_json["loads"][axle_number].GetVector())
@@ -62,13 +82,14 @@ class StemUvecController:
                 values[i] += cond_values[i]
         return KratosMultiphysics.Vector(values)
 
-    def add_empty_variable_to_parameters(self, json_data, axle_number, axle, variable_json):
+    def add_empty_variable_to_parameters(self, json_data, axle_number, variable_json):
         if not json_data.Has(variable_json):
             json_data.AddEmptyValue(variable_json)
         if not json_data[variable_json].Has(axle_number):
             json_data[variable_json].AddValue(axle_number, KratosMultiphysics.Parameters("[]"))
+
     def update_uvec_variable_from_kratos(self, json_data, axle_number, axle, variable_json, variable_kratos):
-        self.add_empty_variable_to_parameters(json_data, axle_number, axle, variable_json)
+        self.add_empty_variable_to_parameters(json_data, axle_number, variable_json)
         json_data[variable_json][axle_number].SetVector(self.getMovingConditionVariable(axle, variable_kratos))
 
     def update_uvec_from_kratos(self, json_data):

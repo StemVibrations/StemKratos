@@ -48,7 +48,6 @@ class StemGeoMechanicsNewtonRaphsonStrategy(GeoMechanicsNewtonRaphsonStrategy):
 
         """
 
-        is_converged = False
         print("Info: Stem SolverSolutionStep")
 
         # update dt in uvec json string
@@ -65,9 +64,9 @@ class StemGeoMechanicsNewtonRaphsonStrategy(GeoMechanicsNewtonRaphsonStrategy):
             # call UVEC dll and update kratos data
             print("Info: Executing UVEC and updating Kratos with result")            
             self.uvec_data = self.uvec_controller.execute_uvec_update_kratos(self.uvec_data)
-            
-            if iter_no != 0 and not is_converged:
-                self.re_initialize_condition_solution_step()
+
+            # set correct condition values
+            self.re_initialize_condition_solution_step()
 
             # call Kratos solver
             is_converged = super().SolveSolutionStep()
