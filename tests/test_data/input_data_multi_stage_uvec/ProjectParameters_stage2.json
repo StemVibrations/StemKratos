@@ -73,7 +73,9 @@
 			"uvec_path"                     :     "my_sample_uvec.py",
 			"uvec_method"				    :     "uvec_test_stage_2",
 			"uvec_model_part"				:	  "moving_load",
-			"uvec_data"						:     {"dt": 0.0, "u":{}, "theta":{}, "loads":{}, "parameters" :{}, "state":{"previous_time_index": 100, "previous_time":  1}}
+			"uvec_data"						:     {"dt": 0.0, "u":{}, "theta":{}, "loads":{},
+                "parameters" :{"output_file_name": "output/calculated_disp"},
+                "state":{"previous_time_index": 100, "previous_time":  1}}
 		}
 
     },
