@@ -43,7 +43,8 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
     def ExecuteInitialize(self):
         """
         This function initializes the process. If the simulation is further than the first step,
-        the set_moving_load_process is loaded. This function name cannot be changed. This name is recognised by Kratos.
+        the set_moving_load_process is loaded. This function name cannot be changed as this name is recognised by
+        Kratos.
         """
 
         super().ExecuteInitialize()
@@ -53,6 +54,11 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
                 self.__serializer.Load(f"set_moving_load_process_{self.model_part.Name}", self)
 
     def ExecuteInitializeSolutionStep(self):
+        """
+        This function initializes the solution step. It updates the load of the conditions to the value of the
+        model part if the load is not zero. This function name cannot be changed. This name is recognised by Kratos.
+
+        """
         precision = 1e-12
         super().ExecuteInitializeSolutionStep()
 
@@ -63,6 +69,11 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
                 condition.SetValue(KSM.POINT_LOAD, self.model_part.GetValue(KSM.POINT_LOAD))
 
     def ExecuteFinalize(self):
+        """
+        This function finalizes the process. If the serialize parameter is set, the process is saved to file. If the
+        clear_at_finalize parameter is set, the nodes and conditions are removed from the model part. This function name
+        cannot be changed as this name is recognised by Kratos.
+        """
         super().ExecuteFinalize()
 
         if self.__do_serialize:
