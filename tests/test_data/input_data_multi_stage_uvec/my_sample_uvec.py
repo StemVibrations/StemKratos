@@ -1,5 +1,6 @@
 from typing import Dict, Any
 import json
+from pathlib import Path
 
 
 def pre_operations(uvec_data: Dict[str, Any]):
@@ -30,6 +31,9 @@ def post_operations(uvec_data: Dict[str, Any]):
         - uvec_data (Dict[str, Any]): input data for the uvec model
 
     """
+
+    # create the output directory if it does not exist
+    Path(uvec_data["parameters"]["output_file_name"]).parent.mkdir(parents=True, exist_ok=True)
 
     # write to file to compare the results
     with open(uvec_data["parameters"]["output_file_name"], 'a+') as f:
