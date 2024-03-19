@@ -86,9 +86,15 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
                 max_index = condition.Id
         return max_index
 
-    def __clone_moving_condition_in_compute_model_part(self, new_body_part_name: str):
+    def __clone_moving_condition_in_compute_model_part(self, new_body_part_name: str) -> KratosMultiphysics.ModelPart:
         """
         This function clones the moving load condition of the current model part to a new model part
+
+        Args:
+            - new_body_part_name (str): name of the new model part
+
+        Returns:
+            - KratosMultiphysics.ModelPart: new model part containing the cloned conditions
         """
 
         # create new model part or get existing one

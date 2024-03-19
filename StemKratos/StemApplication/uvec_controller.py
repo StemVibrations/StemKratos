@@ -99,23 +99,62 @@ class StemUvecController:
                 values[i] += cond_values[i]
         return KratosMultiphysics.Vector(values)
 
-    def add_empty_variable_to_parameters(self, json_data, axle_number, variable_json):
+    def add_empty_variable_to_parameters(self,
+                                         json_data: KratosMultiphysics.Parameters,
+                                         axle_number: str,
+                                         variable_json: KratosMultiphysics.Variable):
+        """
+        This function adds an empty variable to the parameters.
+
+        Args:
+            - json_data (KratosMultiphysics.Parameters): input data for the uvec model
+            - axle_number (str): number of the axle
+            - variable_json (KratosMultiphysics.Variable): variable to be added to the parameters
+
+        """
         if not json_data.Has(variable_json):
             json_data.AddEmptyValue(variable_json)
         if not json_data[variable_json].Has(axle_number):
             json_data[variable_json].AddValue(axle_number, KratosMultiphysics.Parameters("[]"))
 
-    def update_uvec_variable_from_kratos(self, json_data, axle_number, axle, variable_json, variable_kratos):
-        self.add_empty_variable_to_parameters(json_data, axle_number, variable_json)
-        json_data[variable_json][axle_number].SetVector(self.getMovingConditionVariable(axle, variable_kratos))
+    def update_uvec_variable_from_kratos(self,
+                                         json_data: KratosMultiphysics.Parameters,
+                                         axle_number: str,
+                                         axle_model_part: KratosMultiphysics.ModelPart,
+                                         variable_json: str,
+                                         variable_kratos: KratosMultiphysics.Variable):
+        """
+        This function updates the UVEC variable from Kratos.
 
-    def update_uvec_from_kratos(self, json_data):
+        Args:
+            - json_data (KratosMultiphysics.Parameters): input data for the uvec model
+            - axle_number (str): number of the axle
+            - axle_model_part (KratosMultiphysics.ModelPart): model part containing the conditions
+            - variable_json (str): variable to be added to the parameters
+            - variable_kratos (KratosMultiphysics.Variable): variable to be added to the parameters
+
+        """
+
+        self.add_empty_variable_to_parameters(json_data, axle_number, variable_json)
+        json_data[variable_json][axle_number].SetVector(self.getMovingConditionVariable(axle_model_part, variable_kratos))
+
+    def update_uvec_from_kratos(self, json_data: KratosMultiphysics.Parameters):
+        """
+        This function updates the UVEC data with the displacement and rotation from Kratos.
+
+        Args:
+            - json_data (KratosMultiphysics.Parameters): input data for the uvec model
+
+        """
         # get data from each axle
-        for axle in self.axle_model_parts:
-            axle_number = (axle.Name.split("_")[-1])
-            self.update_uvec_variable_from_kratos(json_data, axle_number, axle, "u", KratosMultiphysics.DISPLACEMENT)
-            self.update_uvec_variable_from_kratos(json_data, axle_number, axle, "theta", KratosMultiphysics.ROTATION)
-        return json_data
+        for axle_model_part in self.axle_model_parts:
+            axle_number = (axle_model_part.Name.split("_")[-1])
+
+            # get displacement and rotation at the axle contact points in Kratos
+            self.update_uvec_variable_from_kratos(
+                json_data, axle_number, axle_model_part, "u", KratosMultiphysics.DISPLACEMENT)
+            self.update_uvec_variable_from_kratos(
+                json_data, axle_number, axle_model_part, "theta", KratosMultiphysics.ROTATION)
 
     @staticmethod
     def __transfer_load_from_model_part_to_conditions(model_part: KratosMultiphysics.ModelPart, precision=1e-12):
@@ -128,5 +167,5 @@ class StemUvecController:
         """
 
         for condition in model_part.Conditions:
-            if not all(abs(dimLoad) < precision for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
+            if not all(abs(load_magnitude) < precision for load_magnitude in condition.GetValue(KSM.POINT_LOAD)):
                 condition.SetValue(KSM.POINT_LOAD, model_part.GetValue(KSM.POINT_LOAD))
