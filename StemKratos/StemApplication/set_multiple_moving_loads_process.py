@@ -17,7 +17,7 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
     of the model part.
 
     Inheritance:
-        - :class:`KratosMultiphysics.Process`
+        - :class: KratosMultiphysics.Process
 
     Attributes:
         - moving_loads (list): list of moving load processes

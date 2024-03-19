@@ -6,7 +6,7 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
     This process sets the moving load condition.
 
     Inheritance:
-        - :class:`KratosMultiphysics.StructuralMechanicsApplication.SetMovingLoadProcess`
+        - :class: KratosMultiphysics.StructuralMechanicsApplication.SetMovingLoadProcess
 
     Attributes:
         - __do_serialize (bool): bool which indicates if the process is to be serialized
