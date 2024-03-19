@@ -102,14 +102,14 @@ class StemUvecController:
     def add_empty_variable_to_parameters(self,
                                          json_data: KratosMultiphysics.Parameters,
                                          axle_number: str,
-                                         variable_json: KratosMultiphysics.Variable):
+                                         variable_json: str):
         """
         This function adds an empty variable to the parameters.
 
         Args:
             - json_data (KratosMultiphysics.Parameters): input data for the uvec model
             - axle_number (str): number of the axle
-            - variable_json (KratosMultiphysics.Variable): variable to be added to the parameters
+            - variable_json (str): variable to be added to the parameters
 
         """
         if not json_data.Has(variable_json):
@@ -122,7 +122,7 @@ class StemUvecController:
                                          axle_number: str,
                                          axle_model_part: KratosMultiphysics.ModelPart,
                                          variable_json: str,
-                                         variable_kratos: KratosMultiphysics.Variable):
+                                         variable_kratos: KratosMultiphysics.Array1DVariable3):
         """
         This function updates the UVEC variable from Kratos.
 
@@ -131,7 +131,7 @@ class StemUvecController:
             - axle_number (str): number of the axle
             - axle_model_part (KratosMultiphysics.ModelPart): model part containing the conditions
             - variable_json (str): variable to be added to the parameters
-            - variable_kratos (KratosMultiphysics.Variable): variable to be added to the parameters
+            - variable_kratos (KratosMultiphysics.Array1DVariable3): variable to be added to the parameters
 
         """
 

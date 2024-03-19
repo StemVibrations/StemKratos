@@ -65,13 +65,13 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
         for condition in self.model_part.Conditions:
             # update the of load to the value of the model part if the load is not zero.
             # a zero check is done to find the current location of the moving load
-            if not all(abs(dimLoad) < precision for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
+            if not all(abs(load_magnitude) < precision for load_magnitude in condition.GetValue(KSM.POINT_LOAD)):
                 condition.SetValue(KSM.POINT_LOAD, self.model_part.GetValue(KSM.POINT_LOAD))
 
     def ExecuteFinalize(self):
         """
         This function finalizes the process. If the serialize parameter is set, the process is saved to file. If the
-        clear_at_finalize parameter is set, the nodes and conditions are removed from the model part. This function name
+        clear_at_finalize parameter is set, all data is removed from the model part. This function name
         cannot be changed as this name is recognised by Kratos.
         """
         super().ExecuteFinalize()
@@ -81,15 +81,6 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
             self.__serializer.Save(f"set_moving_load_process_{self.model_part.Name}", self)
 
         if self.__do_clear:
-            # remove the nodes and conditions from the model part as required for multistage analysis
-            for node in self.model_part.Nodes:
-                node.Set(KratosMultiphysics.TO_ERASE, True)
-            self.model_part.RemoveNodes(KratosMultiphysics.TO_ERASE)
-
-            for condition in self.model_part.Conditions:
-                condition.Set(KratosMultiphysics.TO_ERASE, True)
-            self.model_part.RemoveConditions(KratosMultiphysics.TO_ERASE)
-
             self.model_part.Clear()
 
 
