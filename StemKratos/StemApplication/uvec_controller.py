@@ -33,26 +33,37 @@ class StemUvecController:
             if (self.uvec_base_model_part + "_cloned_") in part.Name:
                 self.axle_model_parts.append(model_part.GetSubModelPart(part.Name))
 
-    def update_dt(self, json_data):
-        if not json_data.Has("dt"):
-            json_data.AddEmptyValue("dt")
-        json_data.AddDouble("dt", self.axle_model_parts[0].ProcessInfo[KratosMultiphysics.DELTA_TIME])
-        if not json_data.Has("t"):
-            json_data.AddEmptyValue("t")
-        json_data.AddDouble("t", self.axle_model_parts[0].ProcessInfo[KratosMultiphysics.TIME])
-        if not json_data.Has("time_index"):
-            json_data.AddEmptyValue("time_index")
-        json_data.AddInt("time_index", self.axle_model_parts[0].ProcessInfo[KratosMultiphysics.STEP] - 1)
+    def initialise_solution_step(self, json_data: KratosMultiphysics.Parameters):
+        """
+        This function initialises the solution step in case a UVEC model is used.
 
-    def execute_uvec_update_kratos(self, json_data: Dict[str, Any]) -> Dict[str, Any]:
+        Args:
+            - json_data (KratosMultiphysics.Parameters): input data for the UVEC model
+        """
+
+        if len(self.axle_model_parts) > 0:
+
+            if not json_data.Has("dt"):
+                json_data.AddEmptyValue("dt")
+            json_data.AddDouble("dt", self.axle_model_parts[0].ProcessInfo[KratosMultiphysics.DELTA_TIME])
+
+            if not json_data.Has("t"):
+                json_data.AddEmptyValue("t")
+            json_data.AddDouble("t", self.axle_model_parts[0].ProcessInfo[KratosMultiphysics.TIME])
+
+            if not json_data.Has("time_index"):
+                json_data.AddEmptyValue("time_index")
+            json_data.AddInt("time_index", self.axle_model_parts[0].ProcessInfo[KratosMultiphysics.STEP] - 1)
+
+    def execute_uvec_update_kratos(self, json_data: KratosMultiphysics.Parameters) -> KratosMultiphysics.Parameters:
         """
         This function calls the uvec model and updates the Kratos model with the result.
 
         Args:
-            - json_data (Dict[str, Any]): input data for the uvec model
+            - json_data (KratosMultiphysics.Parameters): input data for the uvec model
 
         Returns:
-            - Dict[str, Any]: output data from the uvec model
+            - KratosMultiphysics.Parameters: output data from the uvec model
 
         """
 
@@ -70,7 +81,13 @@ class StemUvecController:
         # add loads from uvec to the model
         for axle in self.axle_model_parts:
             axle_number = (axle.Name.split("_")[-1])
+
+            # set value on model part
             axle.SetValue(KSM.POINT_LOAD, uvec_json["loads"][axle_number].GetVector())
+
+            # transfer load from model part to conditions
+            self.__transfer_load_from_model_part_to_conditions(axle)
+
         return uvec_json
 
     def getMovingConditionVariable(self, axle, Variable):
@@ -99,3 +116,17 @@ class StemUvecController:
             self.update_uvec_variable_from_kratos(json_data, axle_number, axle, "u", KratosMultiphysics.DISPLACEMENT)
             self.update_uvec_variable_from_kratos(json_data, axle_number, axle, "theta", KratosMultiphysics.ROTATION)
         return json_data
+
+    @staticmethod
+    def __transfer_load_from_model_part_to_conditions(model_part: KratosMultiphysics.ModelPart, precision=1e-12):
+        """
+        This function transfers the point load from the model part to the condition which contains a non-zero value.
+
+        Args:
+            - model_part (KratosMultiphysics.ModelPart): model part containing the conditions
+            - precision (float): precision for the zero check
+        """
+
+        for condition in model_part.Conditions:
+            if not all(abs(dimLoad) < precision for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
+                condition.SetValue(KSM.POINT_LOAD, model_part.GetValue(KSM.POINT_LOAD))
