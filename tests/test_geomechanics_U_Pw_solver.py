@@ -25,3 +25,39 @@ def test_KeepAdvancingSolutionLoop():
     # time is within machine precision of end time (negative), solver should not advance
     uvec_solver.main_model_part.ProcessInfo.SetValue(Kratos.TIME, 0.3)
     assert not uvec_solver.KeepAdvancingSolutionLoop(0.1 + 0.2)
+
+def test_PrepareModelPart():
+    """
+    Test the PrepareModelPart function. Tests if the function maintains the current step between stages.
+    """
+
+    # initialize model
+    model = Kratos.Model()
+    settings = Kratos.Parameters("""{}""")
+
+    # get default settings
+    default_settings = UPwUvecSolver(model, settings).GetDefaultParameters()
+
+    # refer to empty soil model part
+    default_settings["problem_domain_sub_model_part_list"].SetStringArray(["Soil_drained-auto-1"])
+    default_settings["processes_sub_model_part_list"].SetStringArray(["Soil_drained-auto-1"])
+    default_settings["body_domain_sub_model_part_list"].SetStringArray(["Soil_drained-auto-1"])
+
+    # add material parameters
+    default_settings["material_import_settings"]["materials_filename"].SetString(
+        "tests/test_data/input_data_multi_stage_uvec/MaterialParameters.json")
+
+    # initialize solver
+    uvec_solver = UPwUvecSolver(model, default_settings)
+
+    # add empty sub model part
+    uvec_solver.main_model_part.CreateSubModelPart("Soil_drained-auto-1")
+
+    # set current step
+    uvec_solver.main_model_part.ProcessInfo.SetValue(Kratos.STEP, 5)
+
+    # call function
+    uvec_solver.PrepareModelPart()
+
+    # check if the current step is maintained
+    assert uvec_solver.main_model_part.ProcessInfo[Kratos.STEP] == 5
