@@ -1,9 +1,12 @@
 import os
 from pathlib import Path
-from tests.utils import assert_files_equal, assert_floats_in_files_almost_equal
+
+import pytest
 
 import KratosMultiphysics as Kratos
 import KratosMultiphysics.StemApplication.geomechanics_analysis as analysis
+
+from tests.utils import assert_files_equal, assert_floats_in_files_almost_equal
 
 
 def test_call_uvec_multi_stage():
@@ -64,4 +67,46 @@ def test_call_uvec_multi_stage():
     assert assert_files_equal(expected_vtk_output_dir, main_vtk_output_dir)
 
 
+def test_call_uvec_multi_stage_expected_fail():
+    """
+    Test the call of the UVEC in a multi-stage analysis. This test is expected to fail, as extra DOFS are added in the
+    second stage
+    """
+    test_file_dir = r"tests/test_data/input_data_multi_stage_uvec"
 
+    project_parameters = ["ProjectParameters_stage1.json", "ProjectParameters_stage2.json"]
+
+    cwd = os.getcwd()
+
+    # initialize model
+    model = Kratos.Model()
+
+    # read first stage parameters
+    os.chdir(test_file_dir)
+    with open(project_parameters[0], 'r') as parameter_file:
+        parameters = Kratos.Parameters(parameter_file.read())
+
+    # remove rotation dofs from first stage
+    parameters["solver_settings"]["rotation_dofs"].SetBool(False)
+
+    # create and run first stage
+    stage = analysis.StemGeoMechanicsAnalysis(model, parameters)
+    stage.Run()
+
+    # read second stage parameters
+    with open(project_parameters[1], 'r') as parameter_file:
+        parameters = Kratos.Parameters(parameter_file.read())
+
+    # make sure rotation dofs are added in second stage
+    parameters["solver_settings"]["rotation_dofs"].SetBool(True)
+
+    # create second stage with expected fail
+    with pytest.raises(RuntimeError) as excinfo:
+        analysis.StemGeoMechanicsAnalysis(model, parameters)
+
+    # check if the error message is as expected
+    assert ('Error: Attempting to add the variable "ROTATION" to the model part with name "PorousDomain"'
+            in str(excinfo.value))
+
+    # change working directory back to original working directory
+    os.chdir(cwd)
