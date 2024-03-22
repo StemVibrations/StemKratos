@@ -106,8 +106,8 @@ def Factory(settings, Model):
                 "velocity"        : 1,
                 "origin"          : [0.0,0.0,0.0],
                 "offset"          : 0.0,
-                "serialize"       : False,
-                "clear_at_finalize" : False
+                "serialize"       : false,
+                "clear_at_finalize" : false
             }
             """
                                                      )
