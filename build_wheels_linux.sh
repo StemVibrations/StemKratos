@@ -1,3 +1,12 @@
+NEW_VERSION="9.4.3.3"
+NEW_BRANCH="geo/stem_intermediate_whls"
+
+# Update the build.sh file with version
+sed -i "s/^\(export KRATOS_VERSION=\).*$/\1\"$NEW_VERSION\"/" wheels_linux/build.sh
+
+# Update the Dockerfile file with branch
+sed -i "s#geo/stem_branch#$NEW_BRANCH#" wheels_linux/Dockerfile
+
 # Start docker deamon
 sudo service docker start
 
