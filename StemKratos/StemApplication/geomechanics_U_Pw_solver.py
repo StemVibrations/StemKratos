@@ -38,6 +38,21 @@ class UPwUvecSolver(UPwGeoSolver):
 
         return this_defaults
 
+    def PrepareModelPart(self):
+        """
+        This function makes sure that the current STEP of the simulation is maintained between stages
+        """
+
+        # get current step
+        current_step = self.main_model_part.ProcessInfo[KratosMultiphysics.STEP]
+
+        # call base class function
+        super().PrepareModelPart()
+
+        # set current step
+        self.main_model_part.ProcessInfo.SetValue(KratosMultiphysics.STEP, current_step)
+
+
     def _ConstructSolver(self, builder_and_solver, strategy_type):
         """
         This function constructs the solver according to the solver settings. If newton_raphson_with_uvec is selected,

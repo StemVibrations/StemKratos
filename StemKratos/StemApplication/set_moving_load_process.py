@@ -2,19 +2,87 @@ import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
 
 class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
+    """
+    This process sets the moving load condition.
 
-    def __init__(self, model_part, settings):
+    Inheritance:
+        - :class: KratosMultiphysics.StructuralMechanicsApplication.SetMovingLoadProcess
+
+    Attributes:
+        - __do_serialize (bool): bool which indicates if the process is to be serialized
+        - __do_clear (bool): bool which indicates if the process is to be cleared at finalize
+        - model_part (KratosMultiphysics.ModelPart): model part containing the conditions
+        - __serializer (KratosMultiphysics.FileSerializer): serializer for the process
+    """
+
+    def __init__(self, model_part: KratosMultiphysics.ModelPart, settings: KratosMultiphysics.Parameters):
+        """
+        This process sets the moving load condition.
+
+        Args:
+            - model_part (KratosMultiphysics.ModelPart): model part containing the conditions
+            - settings (KratosMultiphysics.Parameters): settings of the process
+
+        """
+        self.__do_serialize = settings["serialize"].GetBool()
+        self.__do_clear = settings["clear_at_finalize"].GetBool()
+
+        # remove the serialize and clear_at_finalize parameters from the settings as they are not used in the base class
+        settings.RemoveValue("serialize")
+        settings.RemoveValue("clear_at_finalize")
+
         super().__init__(model_part, settings)
         self.model_part = model_part
 
+        # initialize serializer
+        if self.__do_serialize:
+            self.__serializer = KratosMultiphysics.FileSerializer(
+                f"set_moving_load_process_{self.model_part.Name}",
+                KratosMultiphysics.SerializerTraceType.SERIALIZER_NO_TRACE)
+
+    def ExecuteInitialize(self):
+        """
+        This function initializes the process. If the simulation is further than the first step,
+        the set_moving_load_process is loaded. This function name cannot be changed as this name is recognised by
+        Kratos.
+        """
+
+        super().ExecuteInitialize()
+        if self.__do_serialize:
+            # load if process is restarted
+            if self.model_part.ProcessInfo[KratosMultiphysics.STEP] > 0:
+                self.__serializer.Load(f"set_moving_load_process_{self.model_part.Name}", self)
+
     def ExecuteInitializeSolutionStep(self):
+        """
+        This function initializes the solution step. It updates the load of the conditions to the value of the
+        model part if the load is not zero. This function name cannot be changed. This name is recognised by Kratos.
+
+        """
         precision = 1e-12
         super().ExecuteInitializeSolutionStep()
+
         for condition in self.model_part.Conditions:
             # update the of load to the value of the model part if the load is not zero.
             # a zero check is done to find the current location of the moving load
-            if not all(abs(dimLoad) < precision for dimLoad in condition.GetValue(KSM.POINT_LOAD)):
+            if not all(abs(load_magnitude) < precision for load_magnitude in condition.GetValue(KSM.POINT_LOAD)):
                 condition.SetValue(KSM.POINT_LOAD, self.model_part.GetValue(KSM.POINT_LOAD))
+
+    def ExecuteFinalize(self):
+        """
+        This function finalizes the process. If the serialize parameter is set, the process is saved to file. If the
+        clear_at_finalize parameter is set, all data is removed from the model part. This function name
+        cannot be changed as this name is recognised by Kratos.
+        """
+        super().ExecuteFinalize()
+
+        if self.__do_serialize:
+            # save the moving load process to file
+            self.__serializer.Save(f"set_moving_load_process_{self.model_part.Name}", self)
+
+        if self.__do_clear:
+            self.model_part.Clear()
+
 
 def Factory(settings, Model):
     """
@@ -37,7 +105,9 @@ def Factory(settings, Model):
                 "direction"       : [1,1,1],
                 "velocity"        : 1,
                 "origin"          : [0.0,0.0,0.0],
-                "offset"          : 0.0
+                "offset"          : 0.0,
+                "serialize"       : false,
+                "clear_at_finalize" : false
             }
             """
                                                      )
