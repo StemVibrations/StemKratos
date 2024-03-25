@@ -34,7 +34,7 @@ RUN git clone -b 'v5.5.1' --depth 1 https://github.com/MmgTools/mmg /workspace/m
     rm -r /workspace/mmg_5_5_1 && \
     cd /
 
-RUN git clone --depth 1 -b geo/stem_intermediate_whls https://github.com/KratosMultiphysics/Kratos.git /workspace/kratos/Kratos
+RUN git clone --depth 1 -b geo/stem_branch https://github.com/KratosMultiphysics/Kratos.git /workspace/kratos/Kratos
 
 # overwrite the default configuration
 COPY build.sh /workspace/kratos/Kratos/scripts/wheels/linux
