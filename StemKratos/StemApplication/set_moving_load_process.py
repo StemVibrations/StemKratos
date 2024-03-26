@@ -11,6 +11,7 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
     Attributes:
         - __do_serialize (bool): bool which indicates if the process is to be serialized
         - __do_clear (bool): bool which indicates if the process is to be cleared at finalize
+        - __is_externally_managed (bool): bool which indicates if the load is externally managed
         - model_part (KratosMultiphysics.ModelPart): model part containing the conditions
         - __serializer (KratosMultiphysics.FileSerializer): serializer for the process
     """
@@ -26,10 +27,12 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
         """
         self.__do_serialize = settings["serialize"].GetBool()
         self.__do_clear = settings["clear_at_finalize"].GetBool()
+        self.__is_externally_managed = settings["is_externally_managed"].GetBool()
 
         # remove the serialize and clear_at_finalize parameters from the settings as they are not used in the base class
         settings.RemoveValue("serialize")
         settings.RemoveValue("clear_at_finalize")
+        settings.RemoveValue("is_externally_managed")
 
         super().__init__(model_part, settings)
         self.model_part = model_part
@@ -59,14 +62,18 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
         model part if the load is not zero. This function name cannot be changed. This name is recognised by Kratos.
 
         """
-        precision = 1e-12
+
         super().ExecuteInitializeSolutionStep()
 
-        for condition in self.model_part.Conditions:
-            # update the of load to the value of the model part if the load is not zero.
-            # a zero check is done to find the current location of the moving load
-            if not all(abs(load_magnitude) < precision for load_magnitude in condition.GetValue(KSM.POINT_LOAD)):
-                condition.SetValue(KSM.POINT_LOAD, self.model_part.GetValue(KSM.POINT_LOAD))
+        # update the load of the conditions from the value stored in the modelpart only if the value is externally
+        # managed
+        if self.__is_externally_managed:
+            precision = 1e-12
+            for condition in self.model_part.Conditions:
+                # update the of load to the value of the model part if the load is not zero.
+                # a zero check is done to find the current location of the moving load
+                if not all(abs(load_magnitude) < precision for load_magnitude in condition.GetValue(KSM.POINT_LOAD)):
+                    condition.SetValue(KSM.POINT_LOAD, self.model_part.GetValue(KSM.POINT_LOAD))
 
     def ExecuteFinalize(self):
         """
@@ -107,7 +114,8 @@ def Factory(settings, Model):
                 "origin"          : [0.0,0.0,0.0],
                 "offset"          : 0.0,
                 "serialize"       : false,
-                "clear_at_finalize" : false
+                "clear_at_finalize" : false,
+                "is_externally_managed" : false
             }
             """
                                                      )
