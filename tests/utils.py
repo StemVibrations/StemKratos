@@ -1,5 +1,5 @@
 import os
-from typing import Union
+from typing import Union, Tuple
 from pathlib import Path
 
 import KratosMultiphysics as Kratos
@@ -67,7 +67,7 @@ def assert_files_equal(exact_folder: Union[str, Path], test_folder: Union[str,Pa
 
 
 def assert_floats_in_files_almost_equal(exact_file: Union[str, Path],
-                                        test_file: Union[str, Path], decimal: int = 7) -> bool:
+                                        test_file: Union[str, Path], decimal: int = 7) -> Tuple[bool, str]:
     r"""
     Compares two files containing floats and returns True if all floats are equal, False otherwise.
 
@@ -77,7 +77,8 @@ def assert_floats_in_files_almost_equal(exact_file: Union[str, Path],
         - decimal (int): The number of decimal places to compare.
 
     Returns:
-        - bool: True if all floats are equal, False otherwise.
+        - Tuple[bool, str]: Tuple containing True if all floats are equal, False otherwise. If false, de difference is
+                            returned.
     """
 
     with open(exact_file, "r") as f:
@@ -92,5 +93,7 @@ def assert_floats_in_files_almost_equal(exact_file: Union[str, Path],
     for exact, test in zip(exact_data, test_data):
         for e, t in zip(exact, test):
             if round(e, decimal) != round(t, decimal):
-                return False
-    return True
+                error_message = f"Exact: {exact}, Test: {test}, on line: {exact_data.index(exact)}"
+                return False, error_message
+
+    return True, ""

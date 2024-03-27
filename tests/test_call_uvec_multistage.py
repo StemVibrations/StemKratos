@@ -44,11 +44,11 @@ def test_call_uvec_multi_stage():
     expected_disp_file = Path(r"tests/test_data/input_data_multi_stage_uvec/_output/expected_disp")
 
     # check if calculated disp below first wheel is equal to expected disp
-    are_files_equal = assert_floats_in_files_almost_equal(calculated_disp_file, expected_disp_file)
-    # remove calculated disp file as data is appended
+    are_files_equal, message = assert_floats_in_files_almost_equal(calculated_disp_file, expected_disp_file)
 
+    # remove calculated disp file as data is appended
     calculated_disp_file.unlink()
-    assert are_files_equal
+    assert are_files_equal, message
 
     expected_vtk_output_dir = Path("tests/test_data/input_data_multi_stage_uvec/_output/all")
 
