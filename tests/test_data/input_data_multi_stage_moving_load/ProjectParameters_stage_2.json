@@ -1,0 +1,153 @@
+{
+    "problem_data": {
+        "problem_name": "point_load_on_beam",
+        "start_time": 0.45,
+        "end_time": 0.9,
+        "echo_level": 1,
+        "parallel_type": "OpenMP",
+        "number_of_threads": 1
+    },
+    "solver_settings": {
+        "solver_type": "U_Pw",
+        "model_part_name": "PorousDomain",
+        "domain_size": 2,
+        "model_import_settings": {
+            "input_type": "mdpa",
+            "input_filename": "point_load_on_beam_stage_2"
+        },
+        "material_import_settings": {
+            "materials_filename": "MaterialParameters_stage_2.json"
+        },
+        "time_stepping": {
+            "time_step": 0.05,
+            "max_delta_time_factor": 1000
+        },
+        "reduction_factor": 1.0,
+        "increase_factor": 1.0,
+        "buffer_size": 2,
+        "echo_level": 1,
+        "clear_storage": false,
+        "compute_reactions": false,
+        "move_mesh_flag": false,
+        "reform_dofs_at_each_step": false,
+        "nodal_smoothing": true,
+        "block_builder": true,
+        "rebuild_level": 0,
+        "prebuild_dynamics": false,
+        "solution_type": "quasi_static",
+        "rayleigh_m": 0.0,
+        "rayleigh_k": 0.0,
+        "calculate_reactions": true,
+        "rotation_dofs": true,
+        "reset_displacements": false,
+        "scheme_type": "backward_euler",
+        "strategy_type": "newton_raphson",
+        "max_iterations": 15,
+        "min_iterations": 6,
+        "number_cycles": 1,
+        "convergence_criterion": "displacement_criterion",
+        "displacement_relative_tolerance": 0.0001,
+        "displacement_absolute_tolerance": 1e-12,
+        "linear_solver_settings": {
+            "solver_type": "amgcl",
+            "scaling": false,
+            "tolerance": 1e-06,
+            "max_iteration": 1000
+        },
+        "problem_domain_sub_model_part_list": [
+            "beam"
+        ],
+        "processes_sub_model_part_list": [
+            "point_load",
+            "displacementXYZ"
+        ],
+        "body_domain_sub_model_part_list": [
+            "beam"
+        ]
+    },
+    "output_processes": {
+        "vtk_output": [
+            {
+                "python_module": "vtk_output_process",
+                "kratos_module": "KratosMultiphysics",
+                "process_name": "VtkOutputProcess",
+                "Parameters": {
+                    "model_part_name": "PorousDomain",
+                    "output_path": "output/output_vtk_full_model_stage_2",
+                    "file_format": "ascii",
+                    "output_precision": 7,
+                    "output_control_type": "step",
+                    "output_interval": 1,
+                    "nodal_solution_step_data_variables": [
+                        "DISPLACEMENT"
+                    ],
+                    "gauss_point_variables_in_elements": []
+                }
+            }
+        ]
+    },
+    "processes": {
+        "constraints_process_list": [
+            {
+                "python_module": "apply_vector_constraint_table_process",
+                "kratos_module": "KratosMultiphysics.GeoMechanicsApplication",
+                "process_name": "ApplyVectorConstraintTableProcess",
+                "Parameters": {
+                    "active": [
+                        true,
+                        true,
+                        true
+                    ],
+                    "is_fixed": [
+                        true,
+                        true,
+                        true
+                    ],
+                    "value": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "model_part_name": "PorousDomain.displacementXYZ",
+                    "variable_name": "DISPLACEMENT",
+                    "table": [
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            }
+        ],
+        "loads_process_list": [
+            {
+                "python_module": "set_moving_load_process",
+                "kratos_module": "StemApplication",
+                "process_name": "SetMovingLoadProcess",
+                "Parameters": {
+                    "load": [
+                        0,
+                        -80000,
+                        0
+                    ],
+                    "direction": [
+                        1,
+                        0,
+                        0
+                    ],
+                    "velocity": 27.77777777777778,
+                    "origin": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "offset": 0.0,
+                    "model_part_name": "PorousDomain.point_load",
+                    "variable_name": "POINT_LOAD",
+                    "serialize": true,
+                    "clear_at_finalize": false
+                }
+            }
+        ],
+        "auxiliary_process_list": []
+    }
+}
