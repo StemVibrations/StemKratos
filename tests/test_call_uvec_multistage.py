@@ -46,6 +46,7 @@ def test_call_uvec_multi_stage():
     # check if calculated disp below first wheel is equal to expected disp
     are_files_equal = assert_floats_in_files_almost_equal(calculated_disp_file, expected_disp_file)
     # remove calculated disp file as data is appended
+
     calculated_disp_file.unlink()
     assert are_files_equal
 
@@ -110,3 +111,7 @@ def test_call_uvec_multi_stage_expected_fail():
 
     # change working directory back to original working directory
     os.chdir(cwd)
+
+    # remove uvec disp file
+    calculated_disp_file = Path(r"tests/test_data/input_data_multi_stage_uvec/output/calculated_disp")
+    calculated_disp_file.unlink()
