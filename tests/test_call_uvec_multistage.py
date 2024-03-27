@@ -6,7 +6,7 @@ import pytest
 import KratosMultiphysics as Kratos
 import KratosMultiphysics.StemApplication.geomechanics_analysis as analysis
 
-from tests.utils import assert_files_equal, assert_floats_in_files_almost_equal
+from tests.utils import assert_files_equal, assert_floats_in_files_almost_equal, Utils
 
 
 def test_call_uvec_multi_stage():
@@ -17,27 +17,8 @@ def test_call_uvec_multi_stage():
 
     project_parameters = ["ProjectParameters_stage1.json", "ProjectParameters_stage2.json"]
 
-    cwd = os.getcwd()
-
-    # initialize model
-    model = Kratos.Model()
-
-    # loop over all stages
-    for file_name in project_parameters:
-
-        # change working directory to test file directory
-        os.chdir(test_file_dir)
-
-        # read parameters
-        with open(file_name, 'r') as parameter_file:
-            parameters = Kratos.Parameters(parameter_file.read())
-
-        # run stage
-        stage = analysis.StemGeoMechanicsAnalysis(model, parameters)
-        stage.Run()
-
-        # change working directory back to original working directory
-        os.chdir(cwd)
+    # run the analysis
+    Utils.run_stages(test_file_dir, project_parameters)
 
     # calculated disp below first wheel
     calculated_disp_file = Path(r"tests/test_data/input_data_multi_stage_uvec/output/calculated_disp")
