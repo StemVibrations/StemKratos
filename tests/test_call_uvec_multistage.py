@@ -6,7 +6,7 @@ import pytest
 import KratosMultiphysics as Kratos
 import KratosMultiphysics.StemApplication.geomechanics_analysis as analysis
 
-from tests.utils import assert_files_equal, assert_floats_in_files_almost_equal
+from tests.utils import assert_files_equal, assert_floats_in_files_almost_equal, Utils
 
 
 def test_call_uvec_multi_stage():
@@ -17,37 +17,19 @@ def test_call_uvec_multi_stage():
 
     project_parameters = ["ProjectParameters_stage1.json", "ProjectParameters_stage2.json"]
 
-    cwd = os.getcwd()
-
-    # initialize model
-    model = Kratos.Model()
-
-    # loop over all stages
-    for file_name in project_parameters:
-
-        # change working directory to test file directory
-        os.chdir(test_file_dir)
-
-        # read parameters
-        with open(file_name, 'r') as parameter_file:
-            parameters = Kratos.Parameters(parameter_file.read())
-
-        # run stage
-        stage = analysis.StemGeoMechanicsAnalysis(model, parameters)
-        stage.Run()
-
-        # change working directory back to original working directory
-        os.chdir(cwd)
+    # run the analysis
+    Utils.run_multiple_stages(test_file_dir, project_parameters)
 
     # calculated disp below first wheel
     calculated_disp_file = Path(r"tests/test_data/input_data_multi_stage_uvec/output/calculated_disp")
     expected_disp_file = Path(r"tests/test_data/input_data_multi_stage_uvec/_output/expected_disp")
 
     # check if calculated disp below first wheel is equal to expected disp
-    are_files_equal = assert_floats_in_files_almost_equal(calculated_disp_file, expected_disp_file)
+    are_files_equal, message = assert_floats_in_files_almost_equal(calculated_disp_file, expected_disp_file)
+
     # remove calculated disp file as data is appended
     calculated_disp_file.unlink()
-    assert are_files_equal
+    assert are_files_equal, message
 
     expected_vtk_output_dir = Path("tests/test_data/input_data_multi_stage_uvec/_output/all")
 
@@ -110,3 +92,7 @@ def test_call_uvec_multi_stage_expected_fail():
 
     # change working directory back to original working directory
     os.chdir(cwd)
+
+    # remove uvec disp file
+    calculated_disp_file = Path(r"tests/test_data/input_data_multi_stage_uvec/output/calculated_disp")
+    calculated_disp_file.unlink()

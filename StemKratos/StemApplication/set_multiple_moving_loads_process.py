@@ -72,6 +72,7 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
             # make sure the moving load process is serialized and cleared at finalize
             moving_load_parameters.AddBool("serialize", True)
             moving_load_parameters.AddBool("clear_at_finalize", True)
+            moving_load_parameters.AddBool("is_externally_managed", True)
 
             self.moving_loads.append(StemSetMovingLoadProcess(new_model_part, moving_load_parameters))
             count += 1
