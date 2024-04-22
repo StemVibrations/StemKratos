@@ -11,7 +11,7 @@ def test_call_uvec():
 
     parameter_file_name = "ProjectParameters_stage1.json"
 
-    model, stage = Utils.run_stage(test_file_dir, parameter_file_name)
+    Utils.run_multiple_stages(test_file_dir, [parameter_file_name])
 
     assert assert_files_equal(os.path.join(test_file_dir, "_output/porous_computational_model_part"),
                               os.path.join(test_file_dir, "output/porous_computational_model_part"))

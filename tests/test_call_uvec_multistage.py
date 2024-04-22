@@ -18,7 +18,7 @@ def test_call_uvec_multi_stage():
     project_parameters = ["ProjectParameters_stage1.json", "ProjectParameters_stage2.json"]
 
     # run the analysis
-    Utils.run_stages(test_file_dir, project_parameters)
+    Utils.run_multiple_stages(test_file_dir, project_parameters)
 
     # calculated disp below first wheel
     calculated_disp_file = Path(r"tests/test_data/input_data_multi_stage_uvec/output/calculated_disp")

@@ -13,7 +13,7 @@ def test_call_moving_load_multi_stage():
     project_parameters = ["ProjectParameters_stage_1.json", "ProjectParameters_stage_2.json"]
 
     # run the analysis
-    Utils.run_stages(test_file_dir, project_parameters)
+    Utils.run_multiple_stages(test_file_dir, project_parameters)
 
     expected_vtk_output_dir = Path("tests/test_data/input_data_multi_stage_moving_load/_output/all")
 
