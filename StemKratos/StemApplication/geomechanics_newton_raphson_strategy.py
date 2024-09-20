@@ -1,6 +1,28 @@
-from KratosMultiphysics.GeoMechanicsApplication import GeoMechanicsNewtonRaphsonStrategy
+from KratosMultiphysics.GeoMechanicsApplication import GeoMechanicsNewtonRaphsonStrategy, GeoMechanicNewtonRaphsonStrategyLinearElasticDynamic
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
 from KratosMultiphysics.StemApplication.uvec_controller import StemUvecController
+
+class StemGeoMechanicsNewtonRaphsonLinearElasticStrategy(GeoMechanicNewtonRaphsonStrategyLinearElasticDynamic):
+    def __init__(self,
+                 model_part,
+                 scheme,
+                 linear_solver,
+                 convergence_criterion,
+                 builder_and_solver,
+                 strategy_params,
+                 beta,
+                 gamma,
+                 max_iters,
+                 compute_reactions,
+                 move_mesh_flag,
+                 uvec_data):
+        super().__init__(model_part, scheme, linear_solver, convergence_criterion, builder_and_solver,
+                         strategy_params,beta,gamma, 0, compute_reactions, move_mesh_flag)
+        self.model_part = model_part
+        self.max_iters = max_iters
+        self.uvec_data = uvec_data["uvec_data"]
+        self.uvec_controller = StemUvecController(uvec_data, model_part)
+
 
 class StemGeoMechanicsNewtonRaphsonStrategy(GeoMechanicsNewtonRaphsonStrategy):
     """
