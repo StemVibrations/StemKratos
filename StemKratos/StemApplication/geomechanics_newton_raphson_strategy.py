@@ -1,27 +1,92 @@
+from typing import Union
+
+import KratosMultiphysics
 from KratosMultiphysics.GeoMechanicsApplication import GeoMechanicsNewtonRaphsonStrategy, GeoMechanicNewtonRaphsonStrategyLinearElasticDynamic
-import KratosMultiphysics.StructuralMechanicsApplication as KSM
+# import KratosMultiphysics.StructuralMechanicsApplication as KSM
 from KratosMultiphysics.StemApplication.uvec_controller import StemUvecController
 
-class StemGeoMechanicsNewtonRaphsonLinearElasticStrategy(GeoMechanicNewtonRaphsonStrategyLinearElasticDynamic):
+
+# class StemGeoMechanicsNewtonRaphsonLinearElasticStrategy(GeoMechanicNewtonRaphsonStrategyLinearElasticDynamic):
+#     def __init__(self,
+#                  model_part,
+#                  scheme,
+#                  convergence_criterion,
+#                  builder_and_solver,
+#                  max_iters,
+#                  compute_reactions,
+#                  move_mesh_flag
+#                  ):
+#         super().__init__(model_part, scheme,  convergence_criterion, builder_and_solver,
+#                          max_iters, compute_reactions, move_mesh_flag)
+        # self.model_part = model_part
+
+        # self.builder_and_solver = builder_and_solver
+
+        # self.__serializer = KratosMultiphysics.FileSerializer(
+        #     f"linear_elastic_strategy_data",
+        #     KratosMultiphysics.SerializerTraceType.SERIALIZER_TRACE_ALL)
+
+
+    # def Initialize(self):
+    #     """
+    #     This function initializes the Stem GeoMechanics NewtonRaphson Strategy.
+    #
+    #     """
+    #     super().Initialize()
+        # if self.model_part.ProcessInfo[KratosMultiphysics.STEP] > 0:
+        #
+        #     self.__serializer.Load("solver_data", self.model_part)
+
+    # def Finalize(self):
+    #     """
+    #     This function finalizes the Stem GeoMechanics NewtonRaphson Strategy.
+    #
+    #     """
+    #     self.__serializer.Save("solver_data",self.model_part)
+    #     super().Finalize()
+
+class StemGeoMechanicsNewtonRaphsonLinearElasticStrategyUvec(GeoMechanicNewtonRaphsonStrategyLinearElasticDynamic):
     def __init__(self,
                  model_part,
                  scheme,
-                 linear_solver,
                  convergence_criterion,
                  builder_and_solver,
-                 strategy_params,
-                 beta,
-                 gamma,
                  max_iters,
                  compute_reactions,
                  move_mesh_flag,
                  uvec_data):
-        super().__init__(model_part, scheme, linear_solver, convergence_criterion, builder_and_solver,
-                         strategy_params,beta,gamma, 0, compute_reactions, move_mesh_flag)
+        super().__init__(model_part, scheme,  convergence_criterion, builder_and_solver,
+                         0, compute_reactions, move_mesh_flag)
         self.model_part = model_part
         self.max_iters = max_iters
         self.uvec_data = uvec_data["uvec_data"]
+
         self.uvec_controller = StemUvecController(uvec_data, model_part)
+
+
+    def Initialize(self):
+        """
+        This function initializes the Stem GeoMechanics NewtonRaphson Strategy.
+
+        """
+
+        self.uvec_controller.initialise_solution_step(self.uvec_data)
+        super().Initialize()
+
+        # update dt in uvec json string
+
+
+    def SolveSolutionStep(self):
+        """
+        This function executes the solution step of the Stem GeoMechanics NewtonRaphson Strategy.
+
+        this function calls the uvec model each iteration and updates the kratos condition with the result. Furthermore,
+        each non-linear iteration, 1 regular newton-raphson iteration is performed, in order to solve the Kratos
+        problem.
+
+        """
+
+        return solve_uvec_solution_step(self)
 
 
 class StemGeoMechanicsNewtonRaphsonStrategy(GeoMechanicsNewtonRaphsonStrategy):
@@ -60,29 +125,40 @@ class StemGeoMechanicsNewtonRaphsonStrategy(GeoMechanicsNewtonRaphsonStrategy):
 
         """
 
-        print("Info: Stem SolverSolutionStep")
+        return solve_uvec_solution_step(self)
 
-        # update dt in uvec json string
-        self.uvec_controller.initialise_solution_step(self.uvec_data)
+def solve_uvec_solution_step(instance: Union[StemGeoMechanicsNewtonRaphsonLinearElasticStrategyUvec, StemGeoMechanicsNewtonRaphsonStrategy]):
+    """
+    This function executes the solution step of the Stem GeoMechanics NewtonRaphson Strategy.
 
-        for iter_no in range(self.max_iters):
+    this function calls the uvec model each iteration and updates the kratos condition with the result. Furthermore,
+    each non-linear iteration, 1 regular newton-raphson iteration is performed, in order to solve the Kratos
+    problem.
 
-            print("Info: Stem Non_Linear Iteration: ", iter_no + 1)
+    """
+    print("Info: Stem SolverSolutionStep")
 
-            # update UVEC json string from Kratos
-            print("Info: Updating UVEC json string from Kratos")
-            self.uvec_controller.update_uvec_from_kratos(self.uvec_data)
+    # update dt in uvec json string
+    instance.uvec_controller.initialise_solution_step(instance.uvec_data)
 
-            # call UVEC dll and update kratos data
-            print("Info: Executing UVEC and updating Kratos with result")            
-            self.uvec_data = self.uvec_controller.execute_uvec_update_kratos(self.uvec_data)
+    for iter_no in range(instance.max_iters):
 
-            # call Kratos solver
-            is_converged = super().SolveSolutionStep()
+        print("Info: Stem Non_Linear Iteration: ", iter_no + 1)
 
-            # If Kratos has converged, return True
-            if is_converged:
-                return True
+        # update UVEC json string from Kratos
+        print("Info: Updating UVEC json string from Kratos")
+        instance.uvec_controller.update_uvec_from_kratos(instance.uvec_data)
 
-        # If Kratos has not converged, return False
-        return False
+        # call UVEC dll and update kratos data
+        print("Info: Executing UVEC and updating Kratos with result")
+        instance.uvec_data = instance.uvec_controller.execute_uvec_update_kratos(instance.uvec_data)
+
+        # call Kratos solver
+        is_converged = super(type(instance), instance).SolveSolutionStep()
+
+        # If Kratos has converged, return True
+        if is_converged:
+            return True
+
+    # If Kratos has not converged, return False
+    return False
