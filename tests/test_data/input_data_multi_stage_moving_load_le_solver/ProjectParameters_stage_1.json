@@ -77,7 +77,7 @@
                     "file_format": "ascii",
                     "output_precision": 7,
                     "output_control_type": "step",
-                    "output_interval": 1,
+                    "output_interval": 10,
                     "nodal_solution_step_data_variables": [
                         "DISPLACEMENT"
                     ],
