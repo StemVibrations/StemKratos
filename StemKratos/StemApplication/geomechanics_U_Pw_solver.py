@@ -7,9 +7,8 @@ import KratosMultiphysics
 import KratosMultiphysics.GeoMechanicsApplication as GeoMechanicsApplication
 
 from KratosMultiphysics.GeoMechanicsApplication.geomechanics_U_Pw_solver import UPwSolver as UPwGeoSolver
-from KratosMultiphysics.StemApplication.geomechanics_newton_raphson_strategy import StemGeoMechanicsNewtonRaphsonStrategy
-
-from StemKratos.StemApplication.geomechanics_newton_raphson_strategy import StemGeoMechanicsNewtonRaphsonLinearElasticStrategyUvec
+from KratosMultiphysics.StemApplication.geomechanics_newton_raphson_strategy import (StemGeoMechanicsNewtonRaphsonStrategy,
+                                                                                     StemGeoMechanicsNewtonRaphsonLinearElasticStrategyUvec)
 
 
 def CreateSolver(model, custom_settings):
