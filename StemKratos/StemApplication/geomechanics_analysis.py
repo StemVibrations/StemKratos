@@ -1,9 +1,5 @@
 import KratosMultiphysics as Kratos
 
-# import sys
-# sys.path.append(r"C:\software_development\Kratos\bin\Release")
-# sys.path.append(r"C:\software_development\Kratos\bin\Release\libs")
-from KratosMultiphysics.analysis_stage import AnalysisStage
 from KratosMultiphysics.GeoMechanicsApplication.geomechanics_analysis import GeoMechanicsAnalysis
 from KratosMultiphysics.StemApplication.geomechanics_solvers_wrapper import CreateSolver
 
