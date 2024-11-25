@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from shutil import rmtree
 
 from tests.utils import assert_files_equal, Utils
 
@@ -35,6 +36,8 @@ def test_call_moving_load_multi_stage_le_solver():
 
     # check if vtk files are equal
     assert assert_files_equal(expected_vtk_output_dir, main_vtk_output_dir)
+    rmtree(main_vtk_output_dir)
+    os.remove("tests/test_data/input_data_multi_stage_moving_load_le_solver/set_moving_load_process_point_load.rest")
 
 
 def test_call_moving_load_multi_stage():
@@ -66,3 +69,5 @@ def test_call_moving_load_multi_stage():
 
     # check if vtk files are equal
     assert assert_files_equal(expected_vtk_output_dir, main_vtk_output_dir)
+    rmtree(main_vtk_output_dir)
+    os.remove("tests/test_data/input_data_multi_stage_moving_load/set_moving_load_process_point_load.rest")

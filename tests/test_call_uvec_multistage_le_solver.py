@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from shutil import rmtree
 
 from tests.utils import assert_files_equal, assert_floats_in_files_almost_equal, Utils
 
@@ -42,3 +43,6 @@ def test_call_uvec_multi_stage_le_solver():
 
     # check if vtk files are equal
     assert assert_files_equal(expected_vtk_output_dir, main_vtk_output_dir)
+    rmtree(main_vtk_output_dir)
+    os.remove("tests/test_data/input_data_multi_stage_uvec_le_solver/set_moving_load_process_moving_load_cloned_1.rest")
+    os.remove("tests/test_data/input_data_multi_stage_uvec_le_solver/set_moving_load_process_moving_load_cloned_2.rest")

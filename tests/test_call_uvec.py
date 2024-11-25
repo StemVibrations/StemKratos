@@ -1,5 +1,6 @@
 import os
 import shutil
+
 from tests.utils import Utils, assert_files_equal
 
 
@@ -17,3 +18,5 @@ def test_call_uvec():
                               os.path.join(test_file_dir, "output/porous_computational_model_part"))
 
     shutil.rmtree(os.path.join(test_file_dir, "output"))
+    os.remove(os.path.join(test_file_dir, "set_moving_load_process_moving_load_cloned_1.rest"))
+    os.remove(os.path.join(test_file_dir, "set_moving_load_process_moving_load_cloned_2.rest"))
