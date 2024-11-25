@@ -7,9 +7,6 @@ sed -i "s/^\(export KRATOS_VERSION=\).*$/\1\"$NEW_VERSION\"/" wheels_linux/build
 # Update the Dockerfile file with branch
 sed -i "s#geo/stem_branch#$NEW_BRANCH#" wheels_linux/Dockerfile
 
-# Start docker deamon
-sudo service docker start
-
 # Build docker image
 docker build -t stemkratos:1.2 -f ./wheels_linux/Dockerfile ./wheels_linux
 
