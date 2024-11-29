@@ -1,4 +1,4 @@
-KratosMultiphysics==9.5.0.4
-KratosLinearSolversApplication==9.5.0.4
-KratosStructuralMechanicsApplication==9.5.0.4
-KratosGeoMechanicsApplication==9.5.0.4
+KratosMultiphysics==9.5.0.5
+KratosLinearSolversApplication==9.5.0.5
+KratosStructuralMechanicsApplication==9.5.0.5
+KratosGeoMechanicsApplication==9.5.0.5
