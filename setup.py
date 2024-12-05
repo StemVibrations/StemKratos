@@ -10,18 +10,15 @@ def set_install_requirements():
     Creates kratos requirements list
     """
 
-    # kratos_version = "9.5.0.5"
-    kratos_version = "" # temporarily until linux wheels are available
+    kratos_version = "9.5.0.5"
     python_version_part = ""
     platform_part = ""
 
     # get platform part of wheel the name
     if (sys.platform == "win32"):
         platform_part = "-win_amd64.whl"
-        kratos_version = "9.5.0.5" # temporarily until linux wheels are available
     elif (sys.platform == "linux"):
         platform_part = "-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-        kratos_version = "9.5.0.4" # temporarily until linux wheels are available
 
     # get python version part of the wheel name
     if (platform.python_version().startswith("3.9.")):
