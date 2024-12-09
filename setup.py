@@ -29,10 +29,10 @@ def set_install_requirements():
         python_version_part = '-cp311-cp311'
 
     requirements = [
-        f"KratosMultiphysics @ https://github.com/StemVibrations/StemKratos/raw/add_uvec_linear_elastic_strategy/StemKratos/wheels/KratosMultiphysics-{kratos_version}{python_version_part}{platform_part}",
-        f"KratosLinearSolversApplication @ https://github.com/StemVibrations/StemKratos/raw/add_uvec_linear_elastic_strategy/StemKratos/wheels/KratosLinearSolversApplication-{kratos_version}{python_version_part}{platform_part}",
-        f"KratosStructuralMechanicsApplication @ https://github.com/StemVibrations/StemKratos/raw/add_uvec_linear_elastic_strategy/StemKratos/wheels/KratosStructuralMechanicsApplication-{kratos_version}{python_version_part}{platform_part}",
-        f"KratosGeoMechanicsApplication @ https://github.com/StemVibrations/StemKratos/raw/add_uvec_linear_elastic_strategy/StemKratos/wheels/KratosGeoMechanicsApplication-{kratos_version}{python_version_part}{platform_part}"
+        f"KratosMultiphysics @ https://github.com/StemVibrations/StemKratos/raw/main/StemKratos/wheels/KratosMultiphysics-{kratos_version}{python_version_part}{platform_part}",
+        f"KratosLinearSolversApplication @ https://github.com/StemVibrations/StemKratos/raw/main/StemKratos/wheels/KratosLinearSolversApplication-{kratos_version}{python_version_part}{platform_part}",
+        f"KratosStructuralMechanicsApplication @ https://github.com/StemVibrations/StemKratos/raw/main/StemKratos/wheels/KratosStructuralMechanicsApplication-{kratos_version}{python_version_part}{platform_part}",
+        f"KratosGeoMechanicsApplication @ https://github.com/StemVibrations/StemKratos/raw/main/StemKratos/wheels/KratosGeoMechanicsApplication-{kratos_version}{python_version_part}{platform_part}"
                     ]
 
     return requirements
