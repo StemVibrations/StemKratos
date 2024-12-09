@@ -11,7 +11,17 @@ from KratosMultiphysics.StemApplication.geomechanics_newton_raphson_strategy imp
                                                                                      StemGeoMechanicsNewtonRaphsonLinearElasticStrategyUvec)
 
 
-def CreateSolver(model, custom_settings):
+def CreateSolver(model: KratosMultiphysics.Model, custom_settings: KratosMultiphysics.Parameters)-> 'UPwUvecSolver':
+    """
+    This function creates the solver according to the solver settings.
+
+    Args:
+        - model (Kratos.Model): The Kratos model.
+        - custom_settings (Kratos.Parameters): The custom settings of the solver.
+
+    Returns:
+        - UPwUvecSolver: The created solver.
+    """
     return UPwUvecSolver(model, custom_settings)
 
 
@@ -57,11 +67,18 @@ class UPwUvecSolver(UPwGeoSolver):
         self.main_model_part.ProcessInfo.SetValue(KratosMultiphysics.STEP, current_step)
 
 
-    def _ConstructSolver(self, builder_and_solver, strategy_type):
+    def _ConstructSolver(self, builder_and_solver: KratosMultiphysics.BuilderAndSolver, strategy_type: str):
         """
         This function constructs the solver according to the solver settings. If newton_raphson_with_uvec is selected,
         the solver is constructed from the StemGeoMechanicsNewtonRaphsonStrategy class. Else the solver is constructed
         from the base class.
+
+        Args:
+            - builder_and_solver (KratosMultiphysics.BuilderAndSolver): The builder and solver object.
+            - strategy_type (str): The strategy type of the solver.
+
+        return
+            - KratosMultiphysics.BaseSolvingStrategy: The constructed solver.
         """
 
         # define newton raphson with uvec strategy

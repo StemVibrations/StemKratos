@@ -1,5 +1,6 @@
 from typing import Union
 
+import KratosMultiphysics as Kratos
 from KratosMultiphysics.GeoMechanicsApplication import (GeoMechanicsNewtonRaphsonStrategy,
                                                         GeoMechanicNewtonRaphsonStrategyLinearElasticDynamic)
 from KratosMultiphysics.StemApplication.uvec_controller import StemUvecController
@@ -11,16 +12,40 @@ class StemGeoMechanicsNewtonRaphsonLinearElasticStrategyUvec(GeoMechanicNewtonRa
     still behave non-linearly. Each non-linear iteration, the solver calls
     the uvec model. The uvec model is used to update the Kratos model. The Kratos model is then solved
     using the linear elastic NewtonRaphson strategy.
+
+    Inheritance:
+        - :class:`KratosMultiphysics.GeoMechanicsApplication.GeoMechanicNewtonRaphsonStrategyLinearElasticDynamic`
+
+    Attributes:
+        - model_part (Kratos.ModelPart): The model part of the strategy.
+        - max_iters (int): The maximum number of non-linear iterations.
+        - uvec_data (dict): The UVEC data.
+        - uvec_controller (:class:`KratosMultiphysics.StemApplication.uvec_controller.StemUvecController````): The
+            UVEC controller.
+
     """
     def __init__(self,
-                 model_part,
-                 scheme,
-                 convergence_criterion,
-                 builder_and_solver,
-                 max_iters,
-                 compute_reactions,
-                 move_mesh_flag,
-                 uvec_data):
+                 model_part: Kratos.ModelPart,
+                 scheme: Kratos.Scheme,
+                 convergence_criterion: Kratos.ConvergenceCriteria,
+                 builder_and_solver: Kratos.BuilderAndSolver,
+                 max_iters: int,
+                 compute_reactions: bool,
+                 move_mesh_flag: bool,
+                 uvec_data: dict):
+        """
+        Initialize the Stem GeoMechanics NewtonRaphson Strategy with a linear elastic solver.
+
+        Args:
+            - model_part (Kratos.ModelPart): The model part of the strategy.
+            - scheme (Kratos.Scheme): The scheme of the strategy.
+            - convergence_criterion (Kratos.ConvergenceCriteria): The convergence criterion of the strategy.
+            - builder_and_solver (Kratos.BuilderAndSolver): The builder and solver of the strategy.
+            - max_iters (int): The maximum number of non-linear iterations.
+            - compute_reactions (bool): True if the reactions should be computed, False otherwise.
+            - move_mesh_flag (bool): True if the mesh should be moved, False otherwise.
+            - uvec_data (dict): The UVEC data.
+        """
         super().__init__(model_part, scheme,  convergence_criterion, builder_and_solver,
                          0, compute_reactions, move_mesh_flag)
         self.model_part = model_part
@@ -44,7 +69,7 @@ class StemGeoMechanicsNewtonRaphsonLinearElasticStrategyUvec(GeoMechanicNewtonRa
         Solve a time step of the Stem GeoMechanics NewtonRaphson Strategy, using a linear elastic solver and UVEC.
 
         Returns:
-            bool: True if the solution converged, False otherwise
+            - bool: True if the solution converged, False otherwise
         """
 
         return solve_uvec_solution_step(self)
@@ -81,7 +106,7 @@ class StemGeoMechanicsNewtonRaphsonStrategy(GeoMechanicsNewtonRaphsonStrategy):
         Solve a time step of the Stem GeoMechanics NewtonRaphson Strategy, using a UVEC.
 
         Returns:
-            bool: True if the solution converged, False otherwise
+            - bool: True if the solution converged, False otherwise
 
         """
 
@@ -96,11 +121,11 @@ def solve_uvec_solution_step(instance: Union[StemGeoMechanicsNewtonRaphsonLinear
     problem.
 
     Args:
-        instance (Union[:class:`StemGeoMechanicsNewtonRaphsonLinearElasticStrategyUvec`,
-        :class:`StemGeoMechanicsNewtonRaphsonStrategy`]): The instance of the Stem GeoMechanics NewtonRaphson Strategy.
+        - instance (Union[:class:`StemGeoMechanicsNewtonRaphsonLinearElasticStrategyUvec`,
+          :class:`StemGeoMechanicsNewtonRaphsonStrategy`]): The instance of the Stem GeoMechanics NewtonRaphson Strategy.
 
     Returns:
-        bool: True if the solution converged, False otherwise
+        - bool: True if the solution converged, False otherwise
 
     """
     print("Info: Stem SolverSolutionStep")
