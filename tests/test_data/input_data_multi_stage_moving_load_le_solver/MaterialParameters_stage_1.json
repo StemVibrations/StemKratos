@@ -1,0 +1,21 @@
+{
+    "properties": [
+        {
+            "model_part_name": "PorousDomain.beam",
+            "properties_id": 1,
+            "Material": {
+                "Variables": {
+                    "YOUNG_MODULUS": 2870000000.0,
+                    "POISSON_RATIO": 0.3,
+                    "DENSITY": 2303,
+                    "CROSS_AREA": 0.1,
+                    "I33": 0.29
+                },
+                "constitutive_law": {
+                    "name": "LinearElastic2DBeamLaw"
+                }
+            },
+            "Tables": {}
+        }
+    ]
+}

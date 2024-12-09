@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-
+from shutil import rmtree
 import pytest
 
 import KratosMultiphysics as Kratos
@@ -47,6 +47,10 @@ def test_call_uvec_multi_stage():
 
     # check if vtk files are equal
     assert assert_files_equal(expected_vtk_output_dir, main_vtk_output_dir)
+    rmtree(main_vtk_output_dir)
+    os.remove("tests/test_data/input_data_multi_stage_uvec/set_moving_load_process_moving_load_cloned_1.rest")
+    os.remove("tests/test_data/input_data_multi_stage_uvec/set_moving_load_process_moving_load_cloned_2.rest")
+
 
 
 def test_call_uvec_multi_stage_expected_fail():
@@ -96,3 +100,6 @@ def test_call_uvec_multi_stage_expected_fail():
     # remove uvec disp file
     calculated_disp_file = Path(r"tests/test_data/input_data_multi_stage_uvec/output/calculated_disp")
     calculated_disp_file.unlink()
+    rmtree(os.path.join(test_file_dir, "output/porous_computational_model_part_1"))
+    os.remove("tests/test_data/input_data_multi_stage_uvec/set_moving_load_process_moving_load_cloned_1.rest")
+    os.remove("tests/test_data/input_data_multi_stage_uvec/set_moving_load_process_moving_load_cloned_2.rest")
