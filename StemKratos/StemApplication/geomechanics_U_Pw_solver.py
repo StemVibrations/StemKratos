@@ -66,6 +66,23 @@ class UPwUvecSolver(UPwGeoSolver):
         # set current step
         self.main_model_part.ProcessInfo.SetValue(KratosMultiphysics.STEP, current_step)
 
+        # set first and second derivative of displacement to zero for all nodes in case of quasi-static analysis
+        if self.settings["solution_type"].GetString().lower() == "quasi_static":
+            self.__reset_derivatives_to_zero()
+
+
+    def __reset_derivatives_to_zero(self):
+        """
+        This function sets the first and second derivative of the displacement and rotation to zero for all nodes in
+        the model.
+        """
+        KratosMultiphysics.VariableUtils().SetHistoricalVariableToZero(KratosMultiphysics.VELOCITY, self.main_model_part.Nodes)
+        KratosMultiphysics.VariableUtils().SetHistoricalVariableToZero(KratosMultiphysics.ACCELERATION, self.main_model_part.Nodes)
+
+        if self.settings["rotation_dofs"].GetBool():
+            KratosMultiphysics.VariableUtils().SetHistoricalVariableToZero(KratosMultiphysics.ANGULAR_VELOCITY, self.main_model_part.Nodes)
+            KratosMultiphysics.VariableUtils().SetHistoricalVariableToZero(KratosMultiphysics.ANGULAR_ACCELERATION, self.main_model_part.Nodes)
+
 
     def _ConstructSolver(self, builder_and_solver: KratosMultiphysics.BuilderAndSolver, strategy_type: str):
         """
