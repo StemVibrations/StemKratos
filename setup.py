@@ -17,6 +17,7 @@ def set_install_requirements():
     # get platform part of wheel the name
     if (sys.platform == "win32"):
         platform_part = "-win_amd64.whl"
+        kratos_version = "9.5.0.6"
     elif (sys.platform == "linux"):
         platform_part = "-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
 
