@@ -10,14 +10,13 @@ def set_install_requirements():
     Creates kratos requirements list
     """
 
-    kratos_version = "9.5.0.5"
+    kratos_version = "9.5.0.6"
     python_version_part = ""
     platform_part = ""
 
     # get platform part of wheel the name
     if (sys.platform == "win32"):
         platform_part = "-win_amd64.whl"
-        kratos_version = "9.5.0.6"
     elif (sys.platform == "linux"):
         platform_part = "-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
 
@@ -28,6 +27,9 @@ def set_install_requirements():
         python_version_part = '-cp310-cp310'
     elif (platform.python_version().startswith("3.11.")):
         python_version_part = '-cp311-cp311'
+    elif (platform.python_version().startswith("3.12.")):
+        python_version_part = '-cp312-cp312'
+
 
     requirements = [
         f"KratosMultiphysics @ https://github.com/StemVibrations/StemKratos/raw/add_uvec_linear_elastic_strategy/StemKratos/wheels/KratosMultiphysics-{kratos_version}{python_version_part}{platform_part}",
