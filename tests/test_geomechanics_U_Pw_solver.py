@@ -28,7 +28,8 @@ def test_KeepAdvancingSolutionLoop():
 
 def test_PrepareModelPart():
     """
-    Test the PrepareModelPart function. Tests if the function maintains the current step between stages.
+    Test the PrepareModelPart function. Tests if the function maintains the current step between stages. Also tests if
+    the first and second derivative of displacement are set to zero.
     """
 
     # initialize model
@@ -47,11 +48,25 @@ def test_PrepareModelPart():
     default_settings["material_import_settings"]["materials_filename"].SetString(
         "tests/test_data/input_data_multi_stage_uvec/MaterialParameters.json")
 
+    default_settings["rotation_dofs"].SetBool(True)
+    default_settings["solution_type"].SetString("dynamic")
+
     # initialize solver
     uvec_solver = UPwUvecSolver(model, default_settings)
 
     # add empty sub model part
     uvec_solver.main_model_part.CreateSubModelPart("Soil_drained-auto-1")
+
+    # add variables to sub model part
+    uvec_solver.AddVariables()
+    uvec_solver.main_model_part.CreateNewNode(1, 0.0, 0.0, 0.0)
+
+    # set a value to velocity and acceleration
+    uvec_solver.main_model_part.GetNode(1).SetSolutionStepValue(Kratos.VELOCITY, 0, [1,2,3])
+    uvec_solver.main_model_part.GetNode(1).SetSolutionStepValue(Kratos.ACCELERATION, 0, [4,5,6])
+
+    uvec_solver.main_model_part.GetNode(1).SetSolutionStepValue(Kratos.ANGULAR_VELOCITY, 0, [1,2,3])
+    uvec_solver.main_model_part.GetNode(1).SetSolutionStepValue(Kratos.ANGULAR_ACCELERATION, 0, [4,5,6])
 
     # set current step
     uvec_solver.main_model_part.ProcessInfo.SetValue(Kratos.STEP, 5)
@@ -59,5 +74,45 @@ def test_PrepareModelPart():
     # call function
     uvec_solver.PrepareModelPart()
 
+    # check if the first and second derivative of displacement are maintained after PrepareModelPart
+    calculated_velocities = [velocity_val for velocity_val in
+                             uvec_solver.main_model_part.GetNode(1).GetSolutionStepValue(Kratos.VELOCITY, 0)]
+
+    calculated_accelerations = [acceleration_val for acceleration_val in
+                                uvec_solver.main_model_part.GetNode(1).GetSolutionStepValue(Kratos.ACCELERATION, 0)]
+
+    calculated_angular_velocities = [angular_velocity_val for angular_velocity_val in
+                                uvec_solver.main_model_part.GetNode(1).GetSolutionStepValue(Kratos.ANGULAR_VELOCITY, 0)]
+
+    calculated_angular_accelerations = [angular_acceleration_val for angular_acceleration_val in
+                                uvec_solver.main_model_part.GetNode(1).GetSolutionStepValue(Kratos.ANGULAR_ACCELERATION, 0)]
+
+    assert calculated_velocities == [1.0,2.0,3.0]
+    assert calculated_accelerations == [4.0,5.0,6.0]
+    assert calculated_angular_velocities == [1.0,2.0,3.0]
+    assert calculated_angular_accelerations == [4.0,5.0,6.0]
+
     # check if the current step is maintained
     assert uvec_solver.main_model_part.ProcessInfo[Kratos.STEP] == 5
+
+    # call function again with solution type quasi-static
+    default_settings["solution_type"].SetString("quasi_static")
+    uvec_solver.PrepareModelPart()
+
+    # check if the first and second derivative of displacement are set to zero
+    calculated_velocities = [velocity_val for velocity_val in
+                             uvec_solver.main_model_part.GetNode(1).GetSolutionStepValue(Kratos.VELOCITY, 0)]
+
+    calculated_accelerations = [acceleration_val for acceleration_val in
+                                uvec_solver.main_model_part.GetNode(1).GetSolutionStepValue(Kratos.ACCELERATION, 0)]
+
+    calculated_angular_velocities = [angular_velocity_val for angular_velocity_val in
+                                uvec_solver.main_model_part.GetNode(1).GetSolutionStepValue(Kratos.ANGULAR_VELOCITY, 0)]
+
+    calculated_angular_accelerations = [angular_acceleration_val for angular_acceleration_val in
+                                uvec_solver.main_model_part.GetNode(1).GetSolutionStepValue(Kratos.ANGULAR_ACCELERATION, 0)]
+
+    assert calculated_velocities == [0.0,0.0,0.0]
+    assert calculated_accelerations == [0.0,0.0,0.0]
+    assert calculated_angular_velocities == [0.0,0.0,0.0]
+    assert calculated_angular_accelerations == [0.0,0.0,0.0]

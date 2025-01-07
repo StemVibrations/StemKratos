@@ -1,4 +1,4 @@
-NEW_VERSION="9.5.0.5"
+NEW_VERSION="9.5.0.6"
 NEW_BRANCH="geo/linear_elastic_strategy"
 
 # Update the build.sh file with version

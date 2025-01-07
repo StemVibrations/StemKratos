@@ -30,7 +30,7 @@
         "reform_dofs_at_each_step":           false,
         "nodal_smoothing":                    false,
         "block_builder":                      true,
-        "solution_type":                      "Dynamic",
+        "solution_type":                      "Quasi-Static",
         "scheme_type":                        "newmark",
         "reset_displacements":                false,
         "newmark_beta":                       0.25,
@@ -38,7 +38,7 @@
         "newmark_theta":                      0.5,
         "rayleigh_m":                         0.0,
         "rayleigh_k":                         0.0,
-        "strategy_type":                      "newton_raphson_linear_elastic_with_uvec",
+        "strategy_type":                      "newton_raphson_with_uvec",
         "convergence_criterion":              "displacement_criterion",
         "displacement_relative_tolerance":    1.0E-4,
         "displacement_absolute_tolerance":    1.0E-9,
@@ -73,7 +73,7 @@
 			"uvec_path"                     :     "my_sample_uvec.py",
 			"uvec_method"				    :     "uvec_test_stage_1",
 			"uvec_model_part"				:	  "moving_load",
-			"uvec_data"						:     {"dt": 0.0, "u":{}, "theta":{}, "loads":{},
+			"uvec_data"						:     {"dt": 0.0, "u":{}, "theta":{}, "loads": {},
                 "parameters" :{"output_file_name": "output/calculated_disp"},
                 "state":{}}
 		}
@@ -120,8 +120,8 @@
             "variable_name"   : "POINT_LOAD",
             "load"            : [1.0,1.0,1.0],
             "direction"       : [1,1,1],
-			"velocity"        : 2.5,
-			"origin"          : [0.0, 1.0, 0.0],
+			"velocity"        : 0.0,
+			"origin"          : [2.0, 1.0, 0.0],
 			"configuration"	  : [0.0, 1.0],
             "active"          : true
         }
