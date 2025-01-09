@@ -29,6 +29,12 @@ def CreateSolver(model, custom_settings):
         err_msg += "Available options are: \"OpenMP\""
         raise Exception(err_msg)
 
+    # Add the end time and start time to the time_stepping settings
+    custom_settings["solver_settings"]["time_stepping"].AddEmptyValue("end_time")
+    custom_settings["solver_settings"]["time_stepping"].AddEmptyValue("start_time")
+    custom_settings["solver_settings"]["time_stepping"]["end_time"] = custom_settings["problem_data"]["end_time"]
+    custom_settings["solver_settings"]["time_stepping"]["start_time"] = custom_settings["problem_data"]["start_time"]
+
     module_full_name = 'KratosMultiphysics.StemApplication.' + solver_module_name
     solver = import_module(module_full_name).CreateSolver(model, custom_settings["solver_settings"])
 

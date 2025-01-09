@@ -1,6 +1,36 @@
 import KratosMultiphysics as Kratos
 from KratosMultiphysics.StemApplication.geomechanics_U_Pw_solver import UPwUvecSolver
 
+import pytest
+
+def test_ConstructSolver_invalid_time_stepping():
+    """
+    Test the ConstructSolver function. Tests if the function raises an error if the time step is not a multiple of the
+    total time.
+    """
+    # initialize model and settings
+    model = Kratos.Model()
+
+    invalid_time_stepping_settings = Kratos.Parameters("""{
+            "time_step": 0.3,
+            "end_time": 1.0,
+            "start_time": 0.0
+    }""")
+
+    settings = UPwUvecSolver(model, Kratos.Parameters("""{}""")).GetDefaultParameters()
+
+    settings["time_stepping"] =  invalid_time_stepping_settings
+
+    # test if the function raises an error if the time step is not a multiple of the total time
+    uvec_solver = UPwUvecSolver(model, settings)
+    with pytest.raises(ValueError,
+                       match="The time step is not a multiple of the total time. Please adjust the time step."):
+        uvec_solver._ConstructSolver(None,"newton_raphson_linear_elastic" )
+
+    with pytest.raises(ValueError,
+                       match="The time step is not a multiple of the total time. Please adjust the time step."):
+        uvec_solver._ConstructSolver(None,"newton_raphson_linear_elastic_with_uvec" )
+
 
 def test_KeepAdvancingSolutionLoop():
     """
