@@ -1,6 +1,7 @@
 import sys
 
 import math
+from decimal import Decimal
 
 # Import base class file
 import KratosMultiphysics
@@ -47,6 +48,13 @@ class UPwUvecSolver(UPwGeoSolver):
             "uvec_data"				 :     {"parameters":{}, "state":{}}
             }"""))
 
+        # add default time stepping parameters
+        this_defaults.AddValue("time_stepping", KratosMultiphysics.Parameters("""{
+            "time_step"     : 0.0,
+            "start_time"    : 0.0,
+            "end_time"      : 0.0
+        }"""))
+
         # add missing parameters
         this_defaults.AddMissingParameters(super().GetDefaultParameters())
 
@@ -66,6 +74,23 @@ class UPwUvecSolver(UPwGeoSolver):
         # set current step
         self.main_model_part.ProcessInfo.SetValue(KratosMultiphysics.STEP, current_step)
 
+        # set first and second derivative of displacement to zero for all nodes in case of quasi-static analysis
+        if self.settings["solution_type"].GetString().lower() == "quasi_static":
+            self.__reset_derivatives_to_zero()
+
+
+    def __reset_derivatives_to_zero(self):
+        """
+        This function sets the first and second derivative of the displacement and rotation to zero for all nodes in
+        the model.
+        """
+        KratosMultiphysics.VariableUtils().SetHistoricalVariableToZero(KratosMultiphysics.VELOCITY, self.main_model_part.Nodes)
+        KratosMultiphysics.VariableUtils().SetHistoricalVariableToZero(KratosMultiphysics.ACCELERATION, self.main_model_part.Nodes)
+
+        if self.settings["rotation_dofs"].GetBool():
+            KratosMultiphysics.VariableUtils().SetHistoricalVariableToZero(KratosMultiphysics.ANGULAR_VELOCITY, self.main_model_part.Nodes)
+            KratosMultiphysics.VariableUtils().SetHistoricalVariableToZero(KratosMultiphysics.ANGULAR_ACCELERATION, self.main_model_part.Nodes)
+
 
     def _ConstructSolver(self, builder_and_solver: KratosMultiphysics.BuilderAndSolver, strategy_type: str):
         """
@@ -80,6 +105,18 @@ class UPwUvecSolver(UPwGeoSolver):
         return
             - KratosMultiphysics.BaseSolvingStrategy: The constructed solver.
         """
+
+        # check if the time step is a multiple of the total time, Note that this should be moved to the base class
+        if (strategy_type.lower() == "newton_raphson_linear_elastic_with_uvec"
+                or strategy_type.lower() == "newton_raphson_linear_elastic"):
+
+            time_step = self.settings["time_stepping"]["time_step"].GetDouble()
+            end_time = self.settings["time_stepping"]["end_time"].GetDouble()
+            start_time = self.settings["time_stepping"]["start_time"].GetDouble()
+
+            # use decimal to avoid floating point errors
+            if (Decimal(str(end_time)) - Decimal(str(start_time))) % Decimal(str(time_step)) != Decimal("0.0"):
+                raise ValueError("The time step is not a multiple of the total time. Please adjust the time step.")
 
         # define newton raphson with uvec strategy
         if strategy_type.lower() == "newton_raphson_with_uvec":

@@ -1,5 +1,5 @@
 #!/bin/bash
-PYTHONS=("cp39" "cp310" "cp311")
+PYTHONS=("cp39" "cp310" "cp311" "cp312")
 export KRATOS_VERSION="version"
 
 BASE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
@@ -158,6 +158,7 @@ do
     PREFIX_LOCATION=$KRATOS_ROOT/bin/Release/python_$PYTHON
 
     $PYTHON_LOCATION -m pip install mypy
+    $PYTHON_LOCATION -m pip install setuptools
 
     build_interface $PYTHON_LOCATION $PREFIX_LOCATION
 

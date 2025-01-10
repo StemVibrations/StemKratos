@@ -141,7 +141,7 @@
                         0,
                         0
                     ],
-                    "offset": 0.0,
+                    "offset": 10.0,
                     "model_part_name": "PorousDomain.point_load",
                     "variable_name": "POINT_LOAD",
                     "serialize": true,

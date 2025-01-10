@@ -10,7 +10,7 @@ def set_install_requirements():
     Creates kratos requirements list
     """
 
-    kratos_version = "9.5.0.5"
+    kratos_version = "9.5.0.6"
     python_version_part = ""
     platform_part = ""
 
@@ -60,7 +60,6 @@ class CustomStemInstallCommand(install):
 
         # Move the entire directory
         shutil.move(source_path, destination_path)
-
 
 
 if __name__ == '__main__':
