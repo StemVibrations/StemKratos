@@ -38,7 +38,7 @@ class StemSetParameterFieldProcess(SetParameterFieldProcess):
         """
         super().__init__(model, settings)
 
-    def GetVariableBasedOnString(self) ->Optional[KratosMultiphysics.VariableData]:
+    def GetVariableBasedOnString(self) -> Optional[KratosMultiphysics.VariableData]:
         """
         This function returns the variable based on the variable name string.
 
