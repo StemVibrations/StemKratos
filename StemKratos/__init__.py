@@ -10,8 +10,6 @@ import subprocess
 import importlib.metadata
 import sysconfig
 
-from setuptools import setup
-from setuptools.command.install import install
 
 def check_package_version(package_name: str, target_version: str) -> bool:
     """
@@ -148,7 +146,7 @@ def move_stem_application():
     os.makedirs(destination_path, exist_ok=True)
 
     # Move the entire directory
-    shutil.move(source_path, destination_path)
+    shutil.copy(source_path, destination_path)
 
 
 
@@ -166,5 +164,5 @@ if len(requirements) > 0 or REINSTALL:
         print(f"Installing {requirement}")
         subprocess.run(['pip', 'install', requirement])
 
-    move_stem_application()
-
+    if check_package_version("StemKratos", __version__):
+        move_stem_application()
