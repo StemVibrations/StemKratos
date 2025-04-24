@@ -31,6 +31,42 @@ def test_ConstructSolver_invalid_time_stepping():
                        match="The time step is not a multiple of the total time. Please adjust the time step."):
         uvec_solver._ConstructSolver(None,"newton_raphson_linear_elastic_with_uvec" )
 
+def test_ConstructSolver_valid_time_stepping():
+    """
+    Test the ConstructSolver function. Tests if the function does not raise an error if the time step is a multiple of
+    the total time.
+    """
+    # initialize model and settings
+    model = Kratos.Model()
+
+    end_time = 0.02 + 0.4
+
+    # expected floating point error
+    assert end_time != 0.42
+
+    valid_time_stepping_settings = Kratos.Parameters(f"""{{
+            "time_step": 0.004,
+            "end_time": {end_time},
+            "start_time": 0.02
+    }}""")
+
+    settings = UPwUvecSolver(model, Kratos.Parameters("""{}""")).GetDefaultParameters()
+
+    # set the solver type to an invalid type to cancel the run, the run is cancelled after the time step checking
+    settings["solver_type"].SetString("cancel_run")
+
+    settings["time_stepping"] =  valid_time_stepping_settings
+
+    # test if the function does not raise an error if the time step is a multiple of the total time
+    uvec_solver = UPwUvecSolver(model, settings)
+
+    # the solver raised an error after the time step checking
+    with pytest.raises(ValueError,
+                       match="The selected strategy, newton_raphson_linear_elastic_with_uvec, "
+                             "is only available for the U-Pw solver, dynamic solution type and newmark scheme"):
+        uvec_solver._ConstructSolver(None,"newton_raphson_linear_elastic_with_uvec" )
+
+
 
 def test_KeepAdvancingSolutionLoop():
     """
