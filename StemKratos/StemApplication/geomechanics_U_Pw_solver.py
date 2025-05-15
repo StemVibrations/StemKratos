@@ -92,7 +92,7 @@ class UPwUvecSolver(UPwGeoSolver):
             KratosMultiphysics.VariableUtils().SetHistoricalVariableToZero(KratosMultiphysics.ANGULAR_ACCELERATION, self.main_model_part.Nodes)
 
 
-    def _ConstructSolver(self, builder_and_solver: KratosMultiphysics.BuilderAndSolver, strategy_type: str):
+    def _create_solving_strategy(self, builder_and_solver: KratosMultiphysics.BuilderAndSolver, strategy_type: str):
         """
         This function constructs the solver according to the solver settings. If newton_raphson_with_uvec is selected,
         the solver is constructed from the StemGeoMechanicsNewtonRaphsonStrategy class. Else the solver is constructed
@@ -132,8 +132,6 @@ class UPwUvecSolver(UPwGeoSolver):
             uvec_data = self.settings["uvec"]
 
             self.strategy_params = KratosMultiphysics.Parameters("{}")
-            self.strategy_params.AddValue("loads_sub_model_part_list", self.loads_sub_sub_model_part_list)
-            self.strategy_params.AddValue("loads_variable_list", self.settings["loads_variable_list"])
             solving_strategy = StemGeoMechanicsNewtonRaphsonStrategy(self.computing_model_part,
                                                                      self.scheme,
                                                                      self.linear_solver,
@@ -171,8 +169,6 @@ class UPwUvecSolver(UPwGeoSolver):
                                  f"an increase_factor of 1.0.")
 
             self.strategy_params = KratosMultiphysics.Parameters("{}")
-            self.strategy_params.AddValue("loads_sub_model_part_list", self.loads_sub_sub_model_part_list)
-            self.strategy_params.AddValue("loads_variable_list", self.settings["loads_variable_list"])
 
             beta = self.settings["newmark_beta"].GetDouble()
             gamma = self.settings["newmark_gamma"].GetDouble()
@@ -203,7 +199,7 @@ class UPwUvecSolver(UPwGeoSolver):
             return solving_strategy
 
         else:
-            return super()._ConstructSolver(builder_and_solver, strategy_type)
+            return super()._create_solving_strategy(builder_and_solver, strategy_type)
 
     def KeepAdvancingSolutionLoop(self, end_time: float) -> bool:
         """
