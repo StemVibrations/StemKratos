@@ -1,3 +1,5 @@
+import json
+
 # Importing the Kratos Library
 import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
@@ -25,6 +27,8 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         - settings (KratosMultiphysics.Parameters): settings of the process
         - root_model_part (KratosMultiphysics.ModelPart): root model part
         - compute_model_part (KratosMultiphysics.ModelPart): compute model part containing the calculation settings
+        - __max_id_condition_ids (list): list of maximum condition ids, used for each model part to ensure unique ids
+        - __serialize_file_name (str): name of the file to serialize the process
 
     """
 
@@ -45,6 +49,14 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         self.compute_model_part = self.root_model_part.GetSubModelPart(
             self.settings["compute_model_part_name"].GetString())
 
+        self.__max_id_condition_ids = []
+
+        self.__serialize_file_name = f"set_multiple_moving_load_process_{self.model_part.Name}"
+
+        # load if the process is restarted
+        if self.model_part.ProcessInfo[KratosMultiphysics.STEP] > 0:
+            self.load_python_data()
+
         # add moving load processes
         self.__add_moving_load_processes()
 
@@ -61,7 +73,7 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
             moving_load_parameters = KratosMultiphysics.Parameters(self.settings).Clone()
 
             new_model_part_name = self.settings["model_part_name"].GetString().split('.')[-1] + "_cloned_" + str(count)
-            new_model_part = self.__clone_moving_condition_in_compute_model_part(new_model_part_name)
+            new_model_part = self.__clone_moving_condition_in_compute_model_part(new_model_part_name, count-1)
 
             moving_load_parameters.AddString("model_part_name", new_model_part_name)
             moving_load_parameters.RemoveValue("configuration")
@@ -77,17 +89,33 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
             self.moving_loads.append(StemSetMovingLoadProcess(new_model_part, moving_load_parameters))
             count += 1
 
-    def __get_max_conditions_index(self):
+    def __get_max_conditions_index(self, model_part_idx: int) -> int:
         """
-        This function returns the maximum index of the conditions in the main model part
+        This function returns the maximum index of the conditions in the main model part, if the process is restarted,
+        the maximum index is taken from the serialized file. If the process is not restarted, the maximum index is
+        calculated from the conditions in the model part.
+
+        Args:
+            - model_part_idx (int): index of the model part
+
+        Returns:
+            - int: maximum index of the conditions in the model part
         """
-        max_index = 0
-        for condition in self.model_part.GetRootModelPart().Conditions:
-            if condition.Id > max_index:
-                max_index = condition.Id
+
+        # if the process is restarted, get the maximum index from the serialized file
+        if self.model_part.ProcessInfo[KratosMultiphysics.STEP] > 0:
+            max_index = self.__max_id_condition_ids[model_part_idx]
+        else:
+            # if the process is not restarted, calculate the maximum index from the conditions in the model
+            max_index = 0
+            for condition in self.model_part.GetRootModelPart().Conditions:
+                if condition.Id > max_index:
+                    max_index = condition.Id
+            self.__max_id_condition_ids.append(max_index)
+
         return max_index
 
-    def __clone_moving_condition_in_compute_model_part(self, new_body_part_name: str) -> KratosMultiphysics.ModelPart:
+    def __clone_moving_condition_in_compute_model_part(self, new_body_part_name: str, model_part_idx: int) -> KratosMultiphysics.ModelPart:
         """
         This function clones the moving load condition of the current model part to a new model part
 
@@ -112,7 +140,7 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
         new_model_part.AddNodes(node_ids)
 
         # add conditions to the new model part
-        index = self.__get_max_conditions_index()
+        index = self.__get_max_conditions_index(model_part_idx)
         for condition in self.model_part.Conditions:
             index += 1
             node_ids = [node.Id for node in condition.GetNodes()]
@@ -120,7 +148,16 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
             geom = condition.GetGeometry()
             moving_load_name = CONDITION_NAME_MAP[(geom.WorkingSpaceDimension(), geom.PointsNumber())]
 
-            new_model_part.CreateNewCondition(moving_load_name, index, node_ids, condition.Properties)
+            # create the condition if it doesn't exist, otherwise set the properties of the existing condition
+            if not self.root_model_part.HasCondition(index):
+                new_model_part.CreateNewCondition(moving_load_name, index, node_ids, condition.Properties)
+            else:
+                # get condition from the root model part and set its properties of the new stage
+                existing_cond = self.root_model_part.GetCondition(index)
+                existing_cond.Properties = condition.Properties
+
+                new_model_part.AddConditions([index])
+
 
         return new_model_part
 
@@ -166,8 +203,28 @@ class SetMultipleMovingLoadsProcess(KratosMultiphysics.Process):
                 # finalize the moving load process
                 self.moving_loads[i].ExecuteFinalize()
 
-                # remove the moving load process, this is required for multistage analysis
                 del self.moving_loads[i]
+
+        self.save_python_data()
+
+    def save_python_data(self):
+        """
+        Saves the current state of the process, present in the python class, to a json file.
+        This is used for restarting the process.
+        """
+        save_data = {"max_condition_ids": self.__max_id_condition_ids}
+
+        with open(self.__serialize_file_name + ".json", "w") as f:
+            json.dump(save_data, f, indent=4)
+
+    def load_python_data(self):
+        """
+        Loads the current state of the process, required for the python class, from a json file.
+        """
+
+        with open(self.__serialize_file_name + ".json", "r") as f:
+            data = json.load(f)
+            self.__max_id_condition_ids = data["max_condition_ids"]
 
 def Factory(settings, model):
     """

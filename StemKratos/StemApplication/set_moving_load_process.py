@@ -13,7 +13,8 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
         - __do_clear (bool): bool which indicates if the process is to be cleared at finalize
         - __is_externally_managed (bool): bool which indicates if the load is externally managed
         - model_part (KratosMultiphysics.ModelPart): model part containing the conditions
-        - __serializer (KratosMultiphysics.FileSerializer): serializer for the process
+        - __serialize_file_name (str): name of the file to serialize the process
+        - __serializer_type (KratosMultiphysics.SerializerTraceType): type of the serializer
     """
 
     def __init__(self, model_part: KratosMultiphysics.ModelPart, settings: KratosMultiphysics.Parameters):
@@ -37,11 +38,11 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
         super().__init__(model_part, settings)
         self.model_part = model_part
 
-        # initialize serializer
+        # initialize serializer variables
         if self.__do_serialize:
-            self.__serializer = KratosMultiphysics.FileSerializer(
-                f"set_moving_load_process_{self.model_part.Name}",
-                KratosMultiphysics.SerializerTraceType.SERIALIZER_NO_TRACE)
+            self.__serialize_file_name = f"set_moving_load_process_{self.model_part.Name}"
+            self.__serializer_type = KratosMultiphysics.SerializerTraceType.SERIALIZER_NO_TRACE
+
 
     def ExecuteInitialize(self):
         """
@@ -50,11 +51,25 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
         Kratos.
         """
 
-        super().ExecuteInitialize()
         if self.__do_serialize:
+
             # load if process is restarted
             if self.model_part.ProcessInfo[KratosMultiphysics.STEP] > 0:
-                self.__serializer.Load(f"set_moving_load_process_{self.model_part.Name}", self)
+
+                # create a serializer to load the process and load the process from file
+                load_serializer = KratosMultiphysics.FileSerializer(
+                    self.__serialize_file_name, self.__serializer_type)
+                load_serializer.Load(f"set_moving_load_process_{self.model_part.Name}", self)
+
+                is_restarted = self.model_part.ProcessInfo[KratosMultiphysics.IS_RESTARTED]
+                self.model_part.ProcessInfo[KratosMultiphysics.IS_RESTARTED] = True
+
+                super().ExecuteInitialize()
+                self.model_part.ProcessInfo[KratosMultiphysics.IS_RESTARTED] = is_restarted
+            else:
+                super().ExecuteInitialize()
+        else:
+            super().ExecuteInitialize()
 
     def ExecuteInitializeSolutionStep(self):
         """
@@ -84,8 +99,13 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
         super().ExecuteFinalize()
 
         if self.__do_serialize:
+
+            # create a serializer to save the process to file
+            save_serializer = KratosMultiphysics.FileSerializer(
+                self.__serialize_file_name, self.__serializer_type)
+
             # save the moving load process to file
-            self.__serializer.Save(f"set_moving_load_process_{self.model_part.Name}", self)
+            save_serializer.Save(f"set_moving_load_process_{self.model_part.Name}", self)
 
         if self.__do_clear:
             self.model_part.Clear()

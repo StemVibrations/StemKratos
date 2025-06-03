@@ -134,7 +134,6 @@ class UPwUvecSolver(UPwGeoSolver):
             self.strategy_params = KratosMultiphysics.Parameters("{}")
             solving_strategy = StemGeoMechanicsNewtonRaphsonStrategy(self.computing_model_part,
                                                                      self.scheme,
-                                                                     self.linear_solver,
                                                                      self.convergence_criterion,
                                                                      builder_and_solver,
                                                                      self.strategy_params,
