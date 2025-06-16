@@ -27,6 +27,8 @@ def set_install_requirements():
         python_version_part = '-cp310-cp310'
     elif (platform.python_version().startswith("3.11.")):
         python_version_part = '-cp311-cp311'
+    elif (platform.python_version().startswith("3.12.")):
+        python_version_part = '-cp312-cp312'
 
     requirements = [
         f"KratosMultiphysics @ https://github.com/StemVibrations/StemKratos/raw/support_higher_order/StemKratos/wheels/kratosmultiphysics-{kratos_version}{python_version_part}{platform_part}",
