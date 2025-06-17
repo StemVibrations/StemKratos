@@ -18,7 +18,7 @@ def set_install_requirements():
     if (sys.platform == "win32"):
         platform_part = "-win_amd64.whl"
     elif (sys.platform == "linux"):
-        platform_part = "-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+        platform_part = "-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
 
     # get python version part of the wheel name
     if (platform.python_version().startswith("3.10.")):
