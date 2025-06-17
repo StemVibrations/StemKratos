@@ -1,6 +1,6 @@
 FROM quay.io/pypa/manylinux2014_x86_64
 
-ENV MMG_ROOT=/external_libraries/mmg/mmg_5_5_1
+ENV MMG_ROOT=/external_libraries/mmg/mmg_5_8_0
 ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:{MMG_ROOT}/lib
 
 # Prepare package dependencies
@@ -22,19 +22,19 @@ RUN wget -P /workspace/boost https://archives.boost.io/release/1.74.0/source/boo
 	tar -C /workspace/boost -xzf /workspace/boost/boost_1_74_0.tar.gz; \
 	rm /workspace/boost/boost_1_74_0.tar.gz
 
-# Install MMG 5.5.1
+# Install MMG 5.8.0
 # Note ( upgraded from 5.4.1 because of https://github.com/MmgTools/mmg/issues/85)
-RUN mkdir -p /workspace/mmg_5_5_1
-RUN git clone -b 'v5.5.1' --depth 1 https://github.com/MmgTools/mmg /workspace/mmg_5_5_1 && \
-    mkdir /workspace/mmg_5_5_1/build && \
-    mkdir -p /workspace/external_libraries/mmg/mmg_5_5_1 && \
-    cd /workspace/mmg_5_5_1/build && \
-    cmake .. -DCMAKE_RULE_MESSAGES=OFF -DCMAKE_C_FLAGS="-w" -DCMAKE_CXX_FLAGS="-w" -DCMAKE_INSTALL_PREFIX="/workspace/external_libraries/mmg/mmg_5_5_1" -DLIBMMG3D_SHARED=ON -DLIBMMG2D_SHARED=ON -DLIBMMGS_SHARED=ON -DLIBMMG_SHARED=ON && \
+RUN mkdir -p /workspace/mmg_5_8_0
+RUN git clone -b 'v5.8.0' --depth 1 https://github.com/MmgTools/mmg /workspace/mmg_5_8_0 && \
+    mkdir /workspace/mmg_5_8_0/build && \
+    mkdir -p /workspace/external_libraries/mmg/mmg_5_8_0 && \
+    cd /workspace/mmg_5_8_0/build && \
+    cmake .. -DCMAKE_RULE_MESSAGES=OFF -DCMAKE_C_FLAGS="-w" -DCMAKE_CXX_FLAGS="-w" -DCMAKE_INSTALL_PREFIX="/workspace/external_libraries/mmg/mmg_5_8_0" -DLIBMMG3D_SHARED=ON -DLIBMMG2D_SHARED=ON -DLIBMMGS_SHARED=ON -DLIBMMG_SHARED=ON && \
     make -j2 install && \
-    rm -r /workspace/mmg_5_5_1 && \
+    rm -r /workspace/mmg_5_8_0 && \
     cd /
 
-RUN git clone --depth 1 -b geo/stem_branch https://github.com/KratosMultiphysics/Kratos.git /workspace/kratos/Kratos
+RUN git clone --depth 1 -b geo/linear_elastic_strategy https://github.com/KratosMultiphysics/Kratos.git /workspace/kratos/Kratos
 
 # overwrite the default configuration
 COPY build.sh /workspace/kratos/Kratos/scripts/wheels/linux
