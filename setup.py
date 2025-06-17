@@ -21,9 +21,7 @@ def set_install_requirements():
         platform_part = "-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
 
     # get python version part of the wheel name
-    if (platform.python_version().startswith("3.9.")):
-        python_version_part = '-cp39-cp39'
-    elif (platform.python_version().startswith("3.10.")):
+    if (platform.python_version().startswith("3.10.")):
         python_version_part = '-cp310-cp310'
     elif (platform.python_version().startswith("3.11.")):
         python_version_part = '-cp311-cp311'
