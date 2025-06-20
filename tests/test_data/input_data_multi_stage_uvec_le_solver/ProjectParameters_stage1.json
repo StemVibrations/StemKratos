@@ -31,7 +31,7 @@
         "nodal_smoothing":                    false,
         "block_builder":                      true,
         "solution_type":                      "Quasi-Static",
-        "scheme_type":                        "newmark",
+        "scheme_type":                        "static",
         "reset_displacements":                false,
         "newmark_beta":                       0.25,
         "newmark_gamma":                      0.5,

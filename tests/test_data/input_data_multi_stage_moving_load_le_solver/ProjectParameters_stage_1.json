@@ -40,7 +40,7 @@
         "calculate_reactions": true,
         "rotation_dofs": true,
         "reset_displacements": false,
-        "scheme_type": "backward_euler",
+        "scheme_type": "static",
         "strategy_type": "newton_raphson",
         "max_iterations": 15,
         "min_iterations": 6,

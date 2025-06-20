@@ -43,6 +43,6 @@ cmake -H"${KRATOS_SOURCE}" -B"${KRATOS_BUILD}/${KRATOS_BUILD_TYPE}" \
 -DBLAS_LIBRARIES="/usr/lib64/libblas.so.3"                             \
 -DCMAKE_UNITY_BUILD=ON                                                 \
 -DINCLUDE_MMG=ON                                                       \
--DMMG_ROOT="/workspace/external_libraries/mmg/mmg_5_5_1"               \
+-DMMG_ROOT="/workspace/external_libraries/mmg/mmg_5_8_0"               \
 -DKRATOS_BUILD_TESTING=OFF                                             \
 -DKRATOS_GENERATE_PYTHON_STUBS=ON                                      \
