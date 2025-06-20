@@ -51,23 +51,20 @@ class StemSetMovingLoadProcess(KSM.SetMovingLoadProcess):
         Kratos.
         """
 
-        if self.__do_serialize:
+        # load if process is restarted
+        if self.__do_serialize and self.model_part.ProcessInfo[KratosMultiphysics.STEP] > 0:
 
-            # load if process is restarted
-            if self.model_part.ProcessInfo[KratosMultiphysics.STEP] > 0:
+            # create a serializer to load the process and load the process from file
+            load_serializer = KratosMultiphysics.FileSerializer(
+                self.__serialize_file_name, self.__serializer_type)
+            load_serializer.Load(f"set_moving_load_process_{self.model_part.Name}", self)
 
-                # create a serializer to load the process and load the process from file
-                load_serializer = KratosMultiphysics.FileSerializer(
-                    self.__serialize_file_name, self.__serializer_type)
-                load_serializer.Load(f"set_moving_load_process_{self.model_part.Name}", self)
+            is_restarted = self.model_part.ProcessInfo[KratosMultiphysics.IS_RESTARTED]
+            self.model_part.ProcessInfo[KratosMultiphysics.IS_RESTARTED] = True
 
-                is_restarted = self.model_part.ProcessInfo[KratosMultiphysics.IS_RESTARTED]
-                self.model_part.ProcessInfo[KratosMultiphysics.IS_RESTARTED] = True
+            super().ExecuteInitialize()
+            self.model_part.ProcessInfo[KratosMultiphysics.IS_RESTARTED] = is_restarted
 
-                super().ExecuteInitialize()
-                self.model_part.ProcessInfo[KratosMultiphysics.IS_RESTARTED] = is_restarted
-            else:
-                super().ExecuteInitialize()
         else:
             super().ExecuteInitialize()
 

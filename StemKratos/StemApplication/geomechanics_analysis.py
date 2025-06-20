@@ -7,8 +7,21 @@ from KratosMultiphysics.StemApplication.geomechanics_solvers_wrapper import Crea
 
 
 class StemGeoMechanicsAnalysis(GeoMechanicsAnalysis):
+    """
+    This class is a specialized version of the GeoMechanicsAnalysis class for the STEM application.
 
-    def __init__(self, model, project_parameters):
+    Inheritance:
+        - :class:`KratosMultiphysics.GeoMechanicsApplication.geomechanics_analysis.GeoMechanicsAnalysis`
+    """
+
+    def __init__(self, model: Kratos.Model, project_parameters: Kratos.Parameters):
+        """
+        Constructor for the StemGeoMechanicsAnalysis class.
+
+        Args:
+            model (Kratos.Model): The Kratos model containing the model parts.
+            project_parameters (Kratos.Parameters): The project parameters for the analysis.
+        """
         super().__init__(model, project_parameters)
 
     def Initialize(self):
@@ -36,6 +49,10 @@ class StemGeoMechanicsAnalysis(GeoMechanicsAnalysis):
 
         for element in self._GetSolver().GetComputingModelPart().Elements:
             element.ResetConstitutiveLaw()
+
+        # todo this methodology works for linear elastic, but maybe not for non linear materials in multistage analysis
+        # but if this is not done, uvec will not work in multistage analysis. Kratos issue: #13546
+
 
     def _CreateSolver(self):
         return CreateSolver(self.model, self.project_parameters)
