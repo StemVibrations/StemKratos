@@ -10,7 +10,7 @@ def set_install_requirements():
     Creates kratos requirements list
     """
 
-    kratos_version = "10.1.0.1"
+    kratos_version = "10.1.0.2"
     python_version_part = ""
     platform_part = ""
 
@@ -29,10 +29,10 @@ def set_install_requirements():
         python_version_part = '-cp312-cp312'
 
     requirements = [
-        f"KratosMultiphysics @ https://github.com/StemVibrations/StemKratos/raw/support_higher_order/StemKratos/wheels/KratosMultiphysics-{kratos_version}{python_version_part}{platform_part}",
-        f"KratosLinearSolversApplication @ https://github.com/StemVibrations/StemKratos/raw/support_higher_order/StemKratos/wheels/KratosLinearSolversApplication-{kratos_version}{python_version_part}{platform_part}",
-        f"KratosStructuralMechanicsApplication @ https://github.com/StemVibrations/StemKratos/raw/support_higher_order/StemKratos/wheels/KratosStructuralMechanicsApplication-{kratos_version}{python_version_part}{platform_part}",
-        f"KratosGeoMechanicsApplication @ https://github.com/StemVibrations/StemKratos/raw/support_higher_order/StemKratos/wheels/KratosGeoMechanicsApplication-{kratos_version}{python_version_part}{platform_part}"
+        f"KratosMultiphysics @ https://github.com/StemVibrations/StemKratos/raw/noh_bathe/StemKratos/wheels/KratosMultiphysics-{kratos_version}{python_version_part}{platform_part}",
+        f"KratosLinearSolversApplication @ https://github.com/StemVibrations/StemKratos/raw/noh_bathe/StemKratos/wheels/KratosLinearSolversApplication-{kratos_version}{python_version_part}{platform_part}",
+        f"KratosStructuralMechanicsApplication @ https://github.com/StemVibrations/StemKratos/raw/noh_bathe/StemKratos/wheels/KratosStructuralMechanicsApplication-{kratos_version}{python_version_part}{platform_part}",
+        f"KratosGeoMechanicsApplication @ https://github.com/StemVibrations/StemKratos/raw/noh_bathe/StemKratos/wheels/KratosGeoMechanicsApplication-{kratos_version}{python_version_part}{platform_part}"
                     ]
 
     return requirements
