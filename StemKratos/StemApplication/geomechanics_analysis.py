@@ -1,3 +1,10 @@
+import sys
+
+sys.path.append(r"C:/software_development/Kratos4/bin/Release")
+sys.path.append(r"C:/software_development/Kratos4/bin/Release/libs")
+
+
+
 import KratosMultiphysics as Kratos
 import KratosMultiphysics.GeoMechanicsApplication as KratosGeo
 
