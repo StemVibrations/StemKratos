@@ -30,7 +30,7 @@ def test_add_nodal_parameters_process_nodal_concentrated_element():
 
     json_output_parameters = KratosMultiphysics.Parameters( """{
             "model_part_name": "json_model_part",
-            "output_file_name": "test_data/test_fast_json_output.json",
+            "output_file_name": "tests/test_data/test_fast_json_output.json",
             "output_variables": [
                 "VELOCITY",
                 "DISPLACEMENT"
@@ -48,7 +48,7 @@ def test_add_nodal_parameters_process_nodal_concentrated_element():
     process.ExecuteFinalizeSolutionStep()
 
     # Get the output from the JSON file
-    with open("test_data/test_fast_json_output.json", 'r') as f:
+    with open("tests/test_data/test_fast_json_output.json", 'r') as f:
         data = json.load(f)
 
     displacement_node_1 = [data["NODE_1"]["DISPLACEMENT_X"][0], data["NODE_1"]["DISPLACEMENT_Y"][0], data["NODE_1"]["DISPLACEMENT_Z"][0]]
@@ -60,7 +60,7 @@ def test_add_nodal_parameters_process_nodal_concentrated_element():
     npt.assert_array_almost_equal(velocity_node_1, set_velocity)
 
     # Clean up the output file
-    output_file_path = Path("test_data/test_fast_json_output.json")
+    output_file_path = Path("tests/test_data/test_fast_json_output.json")
     if output_file_path.exists():
         output_file_path.unlink()
 
