@@ -56,6 +56,8 @@ class UPwUvecSolver(UPwGeoSolver):
             "end_time"      : 0.0
         }"""))
 
+        this_defaults.AddValue("use_diagonal_scale_lumping", False)
+
         # add missing parameters
         this_defaults.AddMissingParameters(super().GetDefaultParameters())
 
@@ -226,6 +228,7 @@ class UPwUvecSolver(UPwGeoSolver):
             beta = self.settings["newmark_beta"].GetDouble()
             gamma = self.settings["newmark_gamma"].GetDouble()
             calculate_initial_acceleration = self.settings["initialize_acceleration"].GetBool()
+            use_diagonal_scale_lumping = self.settings["use_diagonal_scale_lumping"].GetBool()
 
             # delta time has to be initialized before solving solution steps
             self.main_model_part.ProcessInfo[KratosMultiphysics.DELTA_TIME] = self.settings["time_stepping"][
@@ -235,8 +238,7 @@ class UPwUvecSolver(UPwGeoSolver):
 
             new_builder_and_solver = GeoMechanicsApplication.ResidualBasedBlockBuilderAndSolverNohBathe(
                 self.linear_solver,
-                beta,
-                gamma,
+                use_diagonal_scale_lumping,
                 calculate_initial_acceleration)
 
             solving_strategy = StemGeoMechanicNewtonRaphsonStrategyNohBatheUvec(
