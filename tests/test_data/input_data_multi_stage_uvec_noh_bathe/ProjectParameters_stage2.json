@@ -63,6 +63,7 @@
         "line_search_tolerance":              0.5,
         "rotation_dofs":                      true,
         "initialize_acceleration":            false,
+        "use_diagonal_scale_lumping":         true,
         "linear_solver_settings":             {
             "solver_type":   "amgcl",
             "scaling":       false

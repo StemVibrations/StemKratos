@@ -7,6 +7,8 @@ import importlib.util
 import KratosMultiphysics
 import KratosMultiphysics.StructuralMechanicsApplication as KSM
 
+import KratosMultiphysics.StemTestApplication as StemApp
+
 
 class StemUvecController:
 
@@ -166,6 +168,8 @@ class StemUvecController:
             - precision (float): precision for the zero check
         """
 
-        for condition in model_part.Conditions:
-            if not all(abs(load_magnitude) < precision for load_magnitude in condition.GetValue(KSM.POINT_LOAD)):
-                condition.SetValue(KSM.POINT_LOAD, model_part.GetValue(KSM.POINT_LOAD))
+        StemApp.UvecUtilities.SetLoadOnCondition(model_part, KSM.POINT_LOAD, precision)
+
+        # for condition in model_part.Conditions:
+        #     if not all(abs(load_magnitude) < precision for load_magnitude in condition.GetValue(KSM.POINT_LOAD)):
+        #         condition.SetValue(KSM.POINT_LOAD, model_part.GetValue(KSM.POINT_LOAD))

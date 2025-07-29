@@ -67,11 +67,18 @@ class StemGeoMechanicsAnalysis(GeoMechanicsAnalysis):
 
 if __name__ == '__main__':
 
-    parameter_file_name = "ProjectParameters.json"
+    import os
+    os.chdir(r"C:\software_development\stem3\run_stem\stiff_files_dir_cg_no_av_5_rail_t5e4")
 
-    with open(parameter_file_name,'r') as parameter_file:
-        parameters = Kratos.Parameters(parameter_file.read())
-
+    parameter_file_names = ["ProjectParameters_stage_1.json", "ProjectParameters_stage_2.json"]
     model = Kratos.Model()
-    simulation = StemGeoMechanicsAnalysis(model, parameters)
-    simulation.Run()
+
+
+    for parameter_file_name in parameter_file_names:
+
+        with open(parameter_file_name,'r') as parameter_file:
+            parameters = Kratos.Parameters(parameter_file.read())
+
+
+        simulation = StemGeoMechanicsAnalysis(model, parameters)
+        simulation.Run()

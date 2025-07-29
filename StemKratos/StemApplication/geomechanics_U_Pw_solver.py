@@ -56,7 +56,7 @@ class UPwUvecSolver(UPwGeoSolver):
             "end_time"      : 0.0
         }"""))
 
-        this_defaults.AddValue("use_diagonal_scale_lumping", False)
+        this_defaults.AddBool("use_diagonal_scale_lumping", False)
 
         # add missing parameters
         this_defaults.AddMissingParameters(super().GetDefaultParameters())
