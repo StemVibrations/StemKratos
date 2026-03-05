@@ -1,0 +1,5 @@
+The licenses for the Kratos Multi-Physics core and applications can be found in:
+        LICENSE/license_GeoMechanicsApplication.txt
+        LICENSE/license_KratosMultiPhysics.txt
+        LICENSE/license_RailwayApplication.txt
+        LICENSE/license_StructuralMechanicsApplication.txt
