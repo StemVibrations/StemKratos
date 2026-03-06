@@ -168,6 +168,10 @@ def clean_linux_wheels(wheel_dir, new_wheels_dir, kratos_version, cpython_versio
                 with open(record, "w", newline="") as f:
                     csv.writer(f).writerows(new)
 
+                # Check if new_wheels_dir is absolute, if not make it relative to current_dir
+                if not os.path.isabs(new_wheels_dir):   
+                    new_wheels_dir = os.path.join(current_dir, new_wheels_dir)
+
                 if not os.path.exists(new_wheels_dir):
                     os.mkdir(new_wheels_dir)
                 out = os.path.join(new_wheels_dir, full_wheel_name)
@@ -212,10 +216,10 @@ if __name__ == "__main__":
     linux_platform_tag = "manylinux_2_34_x86_64"
     windows_platform_tag = "win_amd64"
 
-    download_dir = "dist"
-    cleaned_dir = "dist_cleaned"
+    download_dir = "downloaded_wheels"
+    cleaned_dir = "dist"
 
-    download_release_assets(release_tag, download_dir)
+    # download_release_assets(release_tag, download_dir)
     clean_linux_wheels(download_dir, cleaned_dir, kratos_version, cpython_versions, linux_platform_tag)
     move_windows_wheels(download_dir, cleaned_dir, windows_platform_tag)
     move_platform_independent_wheels(download_dir, cleaned_dir)
