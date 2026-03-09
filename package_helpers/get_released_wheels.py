@@ -219,7 +219,7 @@ if __name__ == "__main__":
     download_dir = "downloaded_wheels"
     cleaned_dir = "dist"
 
-    # download_release_assets(release_tag, download_dir)
+    download_release_assets(release_tag, download_dir)
     clean_linux_wheels(download_dir, cleaned_dir, kratos_version, cpython_versions, linux_platform_tag)
     move_windows_wheels(download_dir, cleaned_dir, windows_platform_tag)
     move_platform_independent_wheels(download_dir, cleaned_dir)
