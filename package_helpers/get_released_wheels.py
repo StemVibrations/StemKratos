@@ -60,11 +60,13 @@ def clean_linux_wheels(wheel_dir, new_wheels_dir, kratos_version, cpython_versio
 
     This is required to reduce the size of the linux wheels.
     """
+
     if sys.platform != "linux":
         raise RuntimeError("This script is intended to be run on Linux systems.")
 
     GLOBAL_RPATH = (
         "$ORIGIN:"
+        "$ORIGIN/../KratosMultiphysics/.libs:"
         "$ORIGIN/../libs:"
         "$ORIGIN/../../stemkratosmultiphysics.libs:"
         "$ORIGIN/../../stemkratosstructuralmechanicsapplication.libs:"
@@ -93,6 +95,8 @@ def clean_linux_wheels(wheel_dir, new_wheels_dir, kratos_version, cpython_versio
     all_wheels_data = [stemrailwayapplication_data, stemgeomechanicsapplication_data,
                        stemstructuralmechanicsapplication_data, stemlinearsolversapplication_data, stemkratoscore_data]
 
+    replacements = {}
+
     current_dir = os.getcwd()
     os.chdir(wheel_dir)
     for data in all_wheels_data:
@@ -119,32 +123,63 @@ def clean_linux_wheels(wheel_dir, new_wheels_dir, kratos_version, cpython_versio
 
                 removed = set()
 
+                # --- PASS 1: Clean up and map the dependencies ---
                 for root, dirs, files in os.walk(tmp):
                     for f in files:
                         p = os.path.join(root, f)
                         rel = os.path.relpath(p, tmp)
 
+                        # 1. Remove pyc files
                         if f.endswith(".pyc"):
                             os.remove(p)
                             removed.add(rel)
 
+                        # 2. Find hashed libraries in the .libs folder, record them, and delete them
                         if rel.startswith(f"{base_wheel_name}.libs"):
-                            if any(f.startswith(prefix) and f.endswith(".so") for prefix in REMOVE_LIBS):
-                                os.remove(p)
-                                removed.add(rel)
+                            for prefix in REMOVE_LIBS:
+                                if f.startswith(prefix) and f.endswith(".so"):
+                                    hashed_name = f
+                                    unhashed_name = prefix + ".so"
+
+                                    # Store this mapping so we can fix the extensions later
+                                    replacements[hashed_name] = unhashed_name
+
+                                    # Delete the duplicate file
+                                    os.remove(p)
+                                    removed.add(rel)
+
+                # --- PASS 2: Patch the remaining .so files ---
+                for root, dirs, files in os.walk(tmp):
+                    for f in files:
+                        p = os.path.join(root, f)
 
                         if f.endswith(".so") and os.path.exists(p):
-                            # strip symbols
-                            subprocess.run(["strip", "--strip-unneeded", p], check=False)
 
-                            # patch rpath
+                            # 1. Update the hardcoded names (from hashed to unhashed)
+                            for hashed_name, unhashed_name in replacements.items():
+                                subprocess.run(
+                                    ["patchelf", "--replace-needed", hashed_name, unhashed_name, p],
+                                    check=False
+                                )
+
+                            # Get existing rpath
+                            result = subprocess.run(
+                                ["patchelf", "--print-rpath", p],
+                                capture_output=True,
+                                text=True
+                            )
+                            old_rpath = result.stdout.strip()
+
+                            # append the new rpath to the existing one, ensuring we don't duplicate entries
+                            NEW_RPATH = f"{old_rpath}:$ORIGIN/../../KratosMultiphysics/.libs" if old_rpath else "$ORIGIN/../../KratosMultiphysics/.libs"
+
                             subprocess.run(
-                                ["patchelf", "--set-rpath", GLOBAL_RPATH, p],
+                                ["patchelf", "--set-rpath", NEW_RPATH, p],
                                 check=False
                             )
 
-                    if "__pycache__" in dirs:
-                        shutil.rmtree(os.path.join(root, "__pycache__"))
+                            # 3. Strip (Optional)
+                            subprocess.run(["strip", "--strip-unneeded", p], check=False)
 
                 rows = []
                 with open(record) as f:
@@ -168,10 +203,6 @@ def clean_linux_wheels(wheel_dir, new_wheels_dir, kratos_version, cpython_versio
                 with open(record, "w", newline="") as f:
                     csv.writer(f).writerows(new)
 
-                # Check if new_wheels_dir is absolute, if not make it relative to current_dir
-                if not os.path.isabs(new_wheels_dir):   
-                    new_wheels_dir = os.path.join(current_dir, new_wheels_dir)
-
                 if not os.path.exists(new_wheels_dir):
                     os.mkdir(new_wheels_dir)
                 out = os.path.join(new_wheels_dir, full_wheel_name)
@@ -181,6 +212,7 @@ def clean_linux_wheels(wheel_dir, new_wheels_dir, kratos_version, cpython_versio
                         for f in files:
                             full = os.path.join(root, f)
                             z.write(full, os.path.relpath(full, tmp))
+
     print("Created:", out)
     os.chdir(current_dir)
 
