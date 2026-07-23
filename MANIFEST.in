@@ -1,0 +1,4 @@
+include LICENSE/license_GeoMechanicsApplication.txt
+include LICENSE/license_KratosMultiPhysics.txt
+include LICENSE/license_RailwayApplication.txt
+include LICENSE/license_StructuralMechanicsApplication.txt
