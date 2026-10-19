@@ -241,10 +241,10 @@ if __name__ == "__main__":
         raise RuntimeError("This script is intended to be run on Linux systems, "
                            "as this is required to clean the linux wheels.")
 
-    release_tag = "release1.4.0"  # exact tag name
+    release_tag = "release1.4.1"  # exact tag name
 
-    kratos_version = "10.4.0.3"
-    cpython_versions = ["cp310-cp310", "cp311-cp311", "cp312-cp312"]
+    kratos_version = "10.4.0.4"
+    cpython_versions = ["cp312-cp312", "cp313-cp313", "cp314-cp314"]
     linux_platform_tag = "manylinux_2_34_x86_64"
     windows_platform_tag = "win_amd64"
 
